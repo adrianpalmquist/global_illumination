@@ -33,9 +33,7 @@ private:
 
 Triangle::Triangle() {}
 
-Triangle::~Triangle() {
-}
-
+Triangle::~Triangle() {}
 
 Triangle::Triangle(vec3* _v1, vec3* _v2, vec3* _v3, ColorDbl* _clr) : v0(_v1), v1(_v2), v2(_v3), clr(_clr) {
     calculateNormal();
@@ -47,7 +45,6 @@ void Triangle::calculateNormal() {
     vec3 baseVec2 = *v2 - *v0;
     vec3 new_normal = normalize(cross(baseVec1, baseVec2));
 
-    std::cout << baseVec1.x << " " << baseVec1.y << std::endl;
     normal = new_normal;
 }
 
@@ -83,7 +80,7 @@ bool Triangle::rayIntersection(vec3 origin, vec3 direction, vec3 &intersection_p
         intersection_point = origin + inv_det*t*direction;
         return true;
     }
-    std::cout << "No hit" << std::endl;
+
     return false;
 }
 

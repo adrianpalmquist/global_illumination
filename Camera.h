@@ -14,8 +14,8 @@ using namespace glm;
 
 class Camera {
 public:
-    static const int CAMERA_WIDTH = 400;
-    static const int CAMERA_HEIGHT = 400;
+    static const int CAMERA_WIDTH = 600;
+    static const int CAMERA_HEIGHT = 600;
     static const int EYE1 = 0;
     static const int EYE2 = 2;
 
@@ -60,44 +60,8 @@ Camera::Camera() {
     }
 
     GetCameraPlane();
-
 }
 
-
-
-//void Camera::Render(Scene scene) {
-//    ColorDbl black = ColorDbl(vec3(0.0,0.0,0.0));
-//    vec3 camera_origin = camera_position;
-//    for (int y = 0; y < CAMERA_HEIGHT; y++) {
-//        for (int x = 0; x < CAMERA_WIDTH; x++) {
-//            vec3 direction = normalize(GetPixelPosition(x,y) - camera_position);
-//            vec3 intersection_point;
-//
-//            //Calculate triangle collision
-//            for (int tri_idx = 0; tri_idx < Scene::TRIANGLE_COUNT; tri_idx++) {
-//                Triangle * triangle = scene.get_triangle_at(tri_idx);
-//                if(triangle->rayIntersection(camera_origin, direction, intersection_point)) {
-//                    //std::cout << triangle->get_normal().x << " " << triangle->get_normal().y << " " << triangle->get_normal().z << std::endl;
-//                    dvec3 new_clr = (double) (1 - dot(triangle->get_normal(), direction)) * triangle->get_clr()->get_rgb();
-//                    camera_plane[y][x].set_clr(new_clr);
-//                    break;
-//                }
-//            }
-//
-//            //Calculate sphere intersection
-//            vec3 collision_normal;
-//            for(int sphere_idx = 0; sphere_idx < Scene::SPHERE_COUNT; sphere_idx++) {
-//                Sphere * sphere = scene.get_sphere_at(sphere_idx);
-//
-//                if(sphere->RayIntersection(camera_origin, direction, intersection_point, collision_normal)) {
-//                    dvec3 new_clr = (double) (1 - dot(collision_normal, direction)) * sphere->get_clr()->get_rgb();
-//                    camera_plane[y][x].set_clr(new_clr);
-//                    break;
-//                }
-//            }
-//        }
-//    }
-//}
 
 vec3 Camera::GetPixelPosition(int x, int y) {
     vec3 base_vector_x = vec3(camera_v3) - vec3(camera_v4);
@@ -107,7 +71,6 @@ vec3 Camera::GetPixelPosition(int x, int y) {
 
 void Camera::GetCameraPlane() {
     float d = (float) (0.5 / tan(field_of_view/2));
-    std::cout << "look_at_distance: " << d << std::endl;
 
     // Initiate camera plane corner vertices
     camera_v1 = vec3(0, -1/d, -1/d);

@@ -39,3 +39,4 @@ const double ColorDbl::get_clr_magnitude() const {
 void ColorDbl::set_rgb(dvec3 _rgb) {
     rgb = _rgb;
 }
+
