@@ -12,12 +12,14 @@ public:
     Renderer();
     void Render();
     void CreateImage();
-    ColorDbl TraceRay(vec3 origin, vec3 direction);
+    ColorDbl TraceRay(vec3 origin, vec3 direction, bool material);
 
 private:
     Scene scene;
     Camera camera;
     int iterations = 1;
+    float n1 = 1.000293; // air
+    float n2 = 1.52; // glass
 };
 
 Renderer::Renderer() {
@@ -31,7 +33,7 @@ void Renderer::Render() {
     for (int y = 0; y < Camera::CAMERA_HEIGHT; y++) {
         for (int x = 0; x < Camera::CAMERA_WIDTH; x++) {
             vec3 direction = camera.get_camera_direction(x,y);
-            ColorDbl clr = TraceRay(origin, direction);
+            ColorDbl clr = TraceRay(origin, direction, 0);
             camera.set_pixel_clr(x,y,clr);
         }
     }
@@ -68,7 +70,7 @@ void Renderer::CreateImage() {
         (void) fclose(fp);
 }
 
-ColorDbl Renderer::TraceRay(vec3 origin, vec3 direction) {
+ColorDbl Renderer::TraceRay(vec3 origin, vec3 direction, bool material) {
     vec3 intersection_point;
     ColorDbl clr;
     //Calculate triangle collision
@@ -86,12 +88,33 @@ ColorDbl Renderer::TraceRay(vec3 origin, vec3 direction) {
     vec3 collision_normal;
     for(int sphere_idx = 0; sphere_idx < Scene::SPHERE_COUNT; sphere_idx++) {
         Sphere * sphere = scene.get_sphere_at(sphere_idx);
-
         if(sphere->RayIntersection(origin, direction, intersection_point, collision_normal)) {
+            if (material == 0) {
+                n1 = 1.000293;
+                n2 = 1.52;
+            }
+            else {
+                n2 = 1.000293;
+                n1 = 1.52;
+            }
+            material = !material;
             dvec3 new_clr = (double) (1 - dot(collision_normal, direction)) * sphere->get_clr()->get_rgb();
             clr = ColorDbl(new_clr);
-            vec3 reflection = normalize(direction - 2 * dot(direction,collision_normal) * collision_normal);
-            return TraceRay(origin, reflection);
+            vec3 reflected = normalize(direction - 2 * dot(direction,collision_normal) * collision_normal);
+            vec3 transmitted = normalize((n1/n2) * reflected + collision_normal * (float) ( (-(n1/n2) * dot(collision_normal,reflected) - sqrt(1 - pow((n1/n2),2) * (1 - (pow(dot(collision_normal,reflected),2)))))));
+            double angle = acos(dot(-direction,collision_normal));
+            std::cout << "angle: " << angle << std::endl;
+            if (material == 1 && angle < 0.73) {
+                double r_s = pow((n1 * cos(angle) - n2 * sqrt(1 - pow((n1 / n2) * sin(angle), 2))) /
+                                 (n1 * cos(angle) + n2 * sqrt(1 - pow((n1 / n2) * sin(angle), 2))), 2);
+                double r_p = pow((n1 * sqrt(1 - pow((n1 / n2) * sin(angle), 2)) - n2 * cos(angle)) /
+                                 (n1 * sqrt(1 - pow((n1 / n2) * sin(angle), 2)) + n2 * cos(angle)), 2);
+                double r = (r_s + r_p) / 2;
+                return TraceRay(origin, transmitted, material);
+            } else {
+                return TraceRay(origin,reflected,material);
+            }
+
             //break;
         }
     }
