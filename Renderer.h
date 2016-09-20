@@ -12,7 +12,7 @@ public:
     Renderer();
     void Render();
     void CreateImage();
-    ColorDbl TraceRay(vec3 origin, vec3 direction, bool material);
+    //ColorDbl TraceRay(vec3 origin, vec3 direction, bool material);
 
 private:
     Scene *scene;
