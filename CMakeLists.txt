@@ -10,5 +10,5 @@ set(GLM_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/libs)
 include_directories(${GLM_INCLUDE_DIRS})
 
 
-set(SOURCE_FILES main.cpp ColorDbl.h Ray.h Triangle.h Scene.h Camera.h Pixel.h Sphere.h Renderer.h)
+set(SOURCE_FILES main.cpp ColorDbl.h Ray.h Triangle.h Scene.h Camera.h Pixel.h Sphere.h Renderer.h Material.h)
 add_executable(TNCG15_Project ${SOURCE_FILES})
