@@ -59,7 +59,7 @@ void RayTracer::TransmitRay(Ray* ray, vec3 collision_normal, bool going_in, vec3
 
 void RayTracer::TraceRay(Ray *ray) {
     vec3 collision_normal, collision_pos;
-    bool reflect;
+    bool reflect; // Temporary, should consist of collision material instead
 
     if (scene->RayIntersection(ray, collision_pos, collision_normal, reflect)) {
         ray->set_end_point(new vec3(collision_pos.x, collision_pos.y, collision_pos.z));
