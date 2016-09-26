@@ -8,17 +8,16 @@
 Renderer::Renderer() {
     scene = new Scene();
     camera = Camera();
+    ray_tracer = RayTracer(scene);
 }
 
 void Renderer::Render() {
     vec3 origin = camera.get_camera_position();
     for (int y = 0; y < Camera::CAMERA_HEIGHT; y++) {
         for (int x = 0; x < Camera::CAMERA_WIDTH; x++) {
-            vec3 direction = camera.get_camera_direction(x,y);
 
-            vec3 *start_point = new vec3(origin);
-            Ray *parent_ray = new Ray(start_point, direction, 0);
-            parent_ray->TraceRay(scene);
+            Ray *parent_ray = new Ray(nullptr, new vec3(origin), camera.get_camera_direction(x,y), 0);
+            ray_tracer.StartRayTracing(parent_ray);
             ColorDbl clr = ColorFromRayTree(parent_ray);
             delete parent_ray;
 
@@ -32,7 +31,7 @@ ColorDbl Renderer::ColorFromRayTree(Ray *parentRay) {
     while (currentRay->get_reflected_ray() != 0) {
         currentRay = currentRay->get_reflected_ray();
     }
-    return currentRay->get_color();
+    return currentRay->get_ray_color();
 }
 
 

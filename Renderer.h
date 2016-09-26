@@ -8,6 +8,7 @@
 #include "Scene.h"
 #include "Ray.h"
 #include "Camera.h"
+#include "RayTracer.h"
 
 class Renderer {
 public:
@@ -17,6 +18,7 @@ public:
 private:
     Scene *scene;
     Camera camera;
+    RayTracer ray_tracer;
 
     ColorDbl ColorFromRayTree(Ray *parentRay);
 };

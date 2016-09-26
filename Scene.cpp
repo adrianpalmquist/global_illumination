@@ -3,6 +3,7 @@
 //
 
 #include "Scene.h"
+#include "Ray.h"
 
 
 Scene::Scene() {
@@ -78,4 +79,34 @@ std::vector<Triangle *> Scene::get_triangles() {
 
 std::vector<Sphere *> Scene::get_spheres() {
     return spheres;
+}
+
+bool Scene::RayIntersection(Ray *ray, vec3 &collision_pos, vec3 &collision_normal, bool &reflect) {
+    bool collision = false;
+    reflect = false;
+
+    //Calculate triangle collision
+    for (std::vector<Triangle*>::iterator it = triangles.begin(); it != triangles.end(); ++it) {
+        Triangle *triangle = *it;
+        if (triangle->rayIntersection(*ray->get_start_point(), ray->get_direction(), collision_pos)) {
+            ray->set_ray_color(ColorDbl((double) (1 - dot(triangle->get_normal(), ray->get_direction())) * triangle->get_clr()->get_rgb()));
+            collision_normal = triangle->get_normal();
+            break;
+        }
+    }
+
+    //Calculate sphere intersection
+    for (std::vector<Sphere*>::iterator it = spheres.begin(); it != spheres.end(); ++it) {
+        Sphere * sphere = *it;
+        if (sphere->RayIntersection(*ray->get_start_point(), ray->get_direction(), collision_pos, collision_normal)) {
+            ray->set_ray_color(ColorDbl((double) (1 - dot(collision_normal, ray->get_direction())) * sphere->get_clr()->get_rgb()));
+            collision = true;
+            reflect = true;
+            break;
+        }
+    }
+
+    if (collision)
+        return true;
+    return false;
 }
