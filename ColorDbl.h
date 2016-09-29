@@ -1,10 +1,11 @@
 //
-// Created by Filip Kantedal on 06/09/16.
+// Created by Filip Kantedal on 23/09/16.
 //
-#pragma once
 
-#include <math.h>
-#include "glm/vec3.hpp"
+#ifndef TNCG15_PROJ_COLORDBL_H
+#define TNCG15_PROJ_COLORDBL_H
+
+#include "glm/glm.hpp"
 
 using namespace glm;
 
@@ -21,35 +22,8 @@ public:
     void set_rgb(dvec3 _rgb);
     const double get_clr_magnitude() const;
 private:
-    dvec3 rgb = dvec3(0.0);
+    dvec3 rgb;
 };
 
-ColorDbl::ColorDbl(double r, double g, double b) {
-    rgb.r = r;
-    rgb.g = g;
-    rgb.b = b;
-}
-
-const dvec3 ColorDbl::get_rgb() const {
-    return rgb;
-}
-
-const double ColorDbl::get_clr_magnitude() const {
-    return sqrt(pow(rgb.r, 2.0) + pow(rgb.g, 2.0) + pow(rgb.b, 2.0));
-}
-
-void ColorDbl::set_rgb(dvec3 _rgb) {
-    rgb = _rgb;
-}
-
-ColorDbl ColorDbl::operator+=(const ColorDbl& clrDbl) {
-    return this->get_rgb() + clrDbl.get_rgb();
-}
-
-ColorDbl ColorDbl::operator/(const int& x) const{
-    ColorDbl temp(this->get_rgb().r/x,
-    this->get_rgb().g/x,
-    this->get_rgb().b/x);
-    return temp;
-}
+#endif //TNCG15_PROJ_COLORDBL_H
 
