@@ -19,7 +19,7 @@ public:
     int get_ray_iterations();
     Ray* get_reflected_ray();
     Ray* get_transmitted_ray();
-    Ray* set_radiance_distribution(double _radiance_distribution);
+    void set_radiance_distribution(double _radiance_distribution);
     ColorDbl get_color();
 private:
     vec3 * start_point;
@@ -153,7 +153,7 @@ Ray *Ray::get_transmitted_ray() {
     return transmitted_ray;
 }
 
-Ray *Ray::set_radiance_distribution(double _radiance_distribution) {
+void Ray::set_radiance_distribution(double _radiance_distribution) {
     radiance_distribution = _radiance_distribution;
 }
 

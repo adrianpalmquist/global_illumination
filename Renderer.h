@@ -20,9 +20,12 @@ private:
 
     ColorDbl ColorFromRayTree(Ray *parentRay);
 
+//    int
+
     int iterations = 1;
     float n1 = 1.000293; // air
     float n2 = 1.52; // glass
+    const int SS = 4;
 
 };
 
@@ -32,19 +35,27 @@ Renderer::Renderer() {
 }
 
 void Renderer::Render() {
+    vector<vec3> sampled_directions;
+    ColorDbl clr;
+    int counter;
+    vec3 direction;
     ColorDbl black = ColorDbl(vec3(0.0,0.0,0.0));
     vec3 origin = camera.get_camera_position();
     for (int y = 0; y < Camera::CAMERA_HEIGHT; y++) {
         for (int x = 0; x < Camera::CAMERA_WIDTH; x++) {
-            vec3 direction = camera.get_camera_direction(x,y);
-
-            vec3 *start_point = new vec3(origin);
-            Ray *parent_ray = new Ray(start_point, direction, 0);
-            parent_ray->TraceRay(scene);
-            ColorDbl clr = ColorFromRayTree(parent_ray);
-            delete parent_ray;
-
-            camera.set_pixel_clr(x,y,clr);
+            sampled_directions = camera.get_camera_direction(x,y);
+            counter = 0;
+            for (std::vector<vec3>::iterator it = sampled_directions.begin(); it != sampled_directions.end(); ++it) {
+                direction = *it;
+                vec3 *start_point = new vec3(origin);
+                Ray *parent_ray = new Ray(start_point, direction, 0);
+                parent_ray->TraceRay(scene);
+                clr += ColorFromRayTree(parent_ray);
+                delete parent_ray;
+                counter++;
+            }
+            clr = clr/SS;
+            camera.set_pixel_clr(x, y, clr);
         }
     }
 }

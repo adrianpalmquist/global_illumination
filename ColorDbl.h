@@ -14,6 +14,8 @@ public:
 
     ColorDbl(dvec3 vec) : rgb(vec) {}
     ColorDbl(double r, double g, double b);
+    ColorDbl operator+=(const ColorDbl& clr_dbl);
+    ColorDbl operator/(const int& x) const;
 
     const dvec3 get_rgb() const;
     void set_rgb(dvec3 _rgb);
@@ -38,5 +40,16 @@ const double ColorDbl::get_clr_magnitude() const {
 
 void ColorDbl::set_rgb(dvec3 _rgb) {
     rgb = _rgb;
+}
+
+ColorDbl ColorDbl::operator+=(const ColorDbl& clrDbl) {
+    return this->get_rgb() + clrDbl.get_rgb();
+}
+
+ColorDbl ColorDbl::operator/(const int& x) const{
+    ColorDbl temp(this->get_rgb().r/x,
+    this->get_rgb().g/x,
+    this->get_rgb().b/x);
+    return temp;
 }
 

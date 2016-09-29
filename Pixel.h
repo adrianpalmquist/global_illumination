@@ -19,6 +19,7 @@ private:
     Ray * base_ray;
 };
 
+
 Ray * Pixel::get_base_ray() const {
     return base_ray;
 }
