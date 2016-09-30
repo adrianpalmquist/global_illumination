@@ -21,15 +21,16 @@ void Renderer::Render() {
         for (int x = 0; x < Camera::CAMERA_WIDTH; x++) {
             sampled_directions = camera.get_camera_direction(x,y);
             counter = 0;
+            clr.set_rgb(dvec3(0.0,0.0,0.0));
             for (std::vector<vec3>::iterator it = sampled_directions.begin(); it != sampled_directions.end(); ++it) {
                 direction = *it;
                 Ray *parent_ray = new Ray(nullptr, new vec3(origin), direction, 0);
                 ray_tracer.StartRayTracing(parent_ray);
-                clr = ColorFromRayTree(parent_ray);
+                clr += ColorFromRayTree(parent_ray);
                 delete parent_ray;
                 counter++;
             }
-            //clr = clr/SS;
+            clr = clr/SS;
             camera.set_pixel_clr(x,y,clr);
         }
     }

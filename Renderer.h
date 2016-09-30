@@ -22,7 +22,7 @@ private:
 
     ColorDbl ColorFromRayTree(Ray *parentRay);
 
-    const int SS = 4;
+    const float SS = 4.0;
 
 };
 

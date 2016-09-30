@@ -89,7 +89,7 @@ bool Scene::RayIntersection(Ray *ray, vec3 &collision_pos, vec3 &collision_norma
     for (std::vector<Triangle*>::iterator it = triangles.begin(); it != triangles.end(); ++it) {
         Triangle *triangle = *it;
         if (triangle->rayIntersection(*ray->get_start_point(), ray->get_direction(), collision_pos)) {
-            ray->set_ray_color(ColorDbl((double) (1 - dot(triangle->get_normal(), ray->get_direction())) * triangle->get_clr()->get_rgb()));
+            ray->set_ray_color(ColorDbl(/*(double) (1 - dot(triangle->get_normal(), ray->get_direction())) * */ triangle->get_clr()->get_rgb()));
             collision_normal = triangle->get_normal();
             break;
         }
