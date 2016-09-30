@@ -2,6 +2,7 @@
 // Created by Filip Kantedal on 23/09/16.
 //
 
+#include <iostream>
 #include "ColorDbl.h"
 
 ColorDbl::ColorDbl(double r, double g, double b) {
@@ -22,8 +23,9 @@ void ColorDbl::set_rgb(dvec3 _rgb) {
     rgb = _rgb;
 }
 
-ColorDbl ColorDbl::operator+=(const ColorDbl& clrDbl) {
-    return this->get_rgb() + clrDbl.get_rgb();
+const ColorDbl& ColorDbl::operator+=(const ColorDbl& clrDbl) {
+    *this = this->get_rgb() + clrDbl.get_rgb();
+    return *this;
 }
 
 ColorDbl ColorDbl::operator/(const int& x) const{

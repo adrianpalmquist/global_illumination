@@ -2,6 +2,7 @@
 // Created by Filip Kantedal on 23/09/16.
 //
 
+#include <iostream>
 #include "Camera.h"
 
 
@@ -35,6 +36,9 @@ std::vector<vec3> Camera::GetPixelPositions(int x, int y) {
     vec3 vert8 = vert7 - dy/(float)2.0;
     vec3 vert9 = vert8 + dx/(float)2.0;
 
+    //std::cout << "1: (" << vert1.r << ", " << vert1.g << ", " << vert1.b << ")" << std::endl;
+    //std::cout << "2: (" << vert2.r << ", " << vert2.g << ", " << vert2.b << ")" << std::endl;
+
     vec3 vect1 = vert2 - vert1;
     vec3 vect2 = vert8 - vert1;
     vec3 vect3 = vert3 - vert2;
@@ -44,16 +48,22 @@ std::vector<vec3> Camera::GetPixelPositions(int x, int y) {
     vec3 vect7 = vert9 - vert8;
     vec3 vect8 = vert7 - vert8;
 
-    vec3 position1 = vect1*(float)rand() + vect2*(float)rand();
-    vec3 position2 = vect3*(float)rand() + vect4*(float)rand();
-    vec3 position3 = vect5*(float)rand() + vect6*(float)rand();
-    vec3 position4 = vect7*(float)rand() + vect8*(float)rand();
+    //std::cout << "(" << vect1.r << ", " << vect1.g << ", " << vect1.b << ")" << std::endl;
+
+
+    vec3 position1 = vert1 + vect1*(float)(rand()/RAND_MAX) + vect2*(float)(rand()/RAND_MAX);
+    vec3 position2 = vert2 + vect3*(float)(rand()/RAND_MAX) + vect4*(float)(rand()/RAND_MAX);
+    vec3 position3 = vert9 + vect5*(float)(rand()/RAND_MAX) + vect6*(float)(rand()/RAND_MAX);
+    vec3 position4 = vert8 + vect7*(float)(rand()/RAND_MAX) + vect8*(float)(rand()/RAND_MAX);
 
 
     positions.push_back(position1);
     positions.push_back(position2);
     positions.push_back(position3);
     positions.push_back(position4);
+
+    //std::cout << "(" << position1.r << ", " << position1.g << ", " << position1.b << ")" << std::endl;
+    //std::cout << "(" << positions.at(0).r << ", " << positions.at(0).g << ", " << positions.at(0).b << ")" << std::endl;
 
     return positions;
 }

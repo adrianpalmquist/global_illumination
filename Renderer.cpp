@@ -25,11 +25,11 @@ void Renderer::Render() {
                 direction = *it;
                 Ray *parent_ray = new Ray(nullptr, new vec3(origin), direction, 0);
                 ray_tracer.StartRayTracing(parent_ray);
-                clr += ColorFromRayTree(parent_ray);
+                clr = ColorFromRayTree(parent_ray);
                 delete parent_ray;
                 counter++;
             }
-            clr = clr/SS;
+            //clr = clr/SS;
             camera.set_pixel_clr(x,y,clr);
         }
     }
