@@ -12,6 +12,8 @@ Renderer::Renderer() {
 }
 
 void Renderer::Render() {
+    scene->PrepareForRender();
+
     vec3 origin = camera.get_camera_position();
     for (int y = 0; y < Camera::CAMERA_HEIGHT; y++) {
         for (int x = 0; x < Camera::CAMERA_WIDTH; x++) {
@@ -29,6 +31,7 @@ void Renderer::Render() {
 ColorDbl Renderer::ColorFromRayTree(Ray *parentRay) {
     Ray* currentRay = parentRay;
     while (currentRay->get_reflected_ray() != 0) {
+        //std::cout << currentRay->get_ray_color().get_rgb().r << " " << currentRay->get_ray_color().get_rgb().g << " " << currentRay->get_ray_color().get_rgb().b << std::endl;
         currentRay = currentRay->get_reflected_ray();
     }
     return currentRay->get_ray_color();

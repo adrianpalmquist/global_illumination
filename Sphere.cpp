@@ -4,7 +4,7 @@
 
 #include "Sphere.h"
 
-Sphere::Sphere(vec3 _position, float _radius, ColorDbl* _clr): position(_position), radius(_radius), clr(_clr) {}
+Sphere::Sphere(vec3 _position, float _radius, BaseMaterial* _material): position(_position), radius(_radius), material(_material) {}
 
 float sum(vec3 vec) {
     //return sqrt(pow(vec.x, 2) + pow(vec.y, 2) + pow(vec.z, 2));
@@ -12,9 +12,9 @@ float sum(vec3 vec) {
 }
 
 bool Sphere::RayIntersection(vec3 origin, vec3 direction, vec3 &intersection_point, vec3 &normal) {
-    float a = sum(direction*direction);
+    float a = sum(direction * direction);
     float b = sum(direction * (2.0f * ( origin - position)));
-    float c = sum(position*position) + sum(origin*origin) -2.0f*sum(origin*position) - radius*radius;
+    float c = sum(position * position) + sum(origin * origin) -2.0f*sum(origin * position) - radius * radius;
     float D = b*b + (-4.0f)*a*c;
 
     // If ray can not intersect then stop
@@ -42,6 +42,6 @@ float Sphere::get_radius() {
     return radius;
 }
 
-ColorDbl* Sphere::get_clr() {
-    return clr;
+BaseMaterial* Sphere::get_material() {
+    return material;
 }

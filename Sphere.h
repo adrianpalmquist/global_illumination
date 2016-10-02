@@ -7,23 +7,24 @@
 
 #include "glm/glm.hpp"
 #include "ColorDbl.h"
+#include "material/BaseMaterial.h"
 
 using namespace glm;
 
 class Sphere {
 public:
-    Sphere(vec3 _position, float _radius, ColorDbl* _clr);
+    Sphere(vec3 _position, float _radius, BaseMaterial* _material);
 
     bool RayIntersection(vec3 origin, vec3 direction, vec3 &intersection_point, vec3 &normal);
 
     // Getters and setters
     vec3 get_position();
     float get_radius();
-    ColorDbl* get_clr();
+    BaseMaterial* get_material();
 private:
     vec3 position;
     float radius;
-    ColorDbl* clr;
+    BaseMaterial* material;
 };
 
 

@@ -57,21 +57,66 @@ void RayTracer::TransmitRay(Ray* ray, vec3 collision_normal, bool going_in, vec3
     }
 }
 
+// Returns radiance contribution from light sources
+void RayTracer::TraceShadowRays(Ray *ray, vec3 collision_point) {
+    std::vector<Triangle*> light_emitting_triangles = scene->get_light_emitting_triangles();
+    for (std::vector<Triangle*>::iterator it = light_emitting_triangles.begin(); it != light_emitting_triangles.end(); ++it) {
+        Triangle *triangle = *it;
+
+        // Generate radom rays from collision point to surface
+        float ray_sum = .5;
+        int ray_num = 0;
+        float u, v;
+        while (ray_num < NUM_SHADOW_RAYS) {
+            u = ((float) rand() / (RAND_MAX)), v = ((float) rand() / (RAND_MAX));
+            if (u + v < 1) {
+                vec3 ray_endpoint = triangle->BarycentricToCartesian(u, v);
+                vec3 ray_direction = ray_endpoint - collision_point;
+                vec3 ray_collision_pos, test1;
+                BaseMaterial collision_material;
+                bool test3;
+
+                if (scene->RayIntersection(collision_point, ray_direction, ray_collision_pos, test1, collision_material, test3)) {
+                    vec3 collision_vector = ray_collision_pos - collision_point;
+                    if (length(ray_direction) <= length(collision_vector) + 0.01) {
+                        ray_sum++;
+                    }
+                }
+
+                ray_num++;
+            }
+        }
+
+        ray->set_ray_color(ColorDbl(ray->get_ray_color().get_rgb() * (0.5 * ((double) ray_sum / (NUM_SHADOW_RAYS+0.5)))));
+    }
+}
+
 void RayTracer::TraceRay(Ray *ray) {
     vec3 collision_normal, collision_pos;
+    BaseMaterial collision_material;
     bool reflect; // Temporary, should consist of collision material instead
 
-    if (scene->RayIntersection(ray, collision_pos, collision_normal, reflect)) {
+    if (scene->RayIntersection(*ray->get_start_point(), ray->get_direction(), collision_pos, collision_normal, collision_material, reflect)) {
+        // Temporary, set ray color to collision color
+        ray->set_ray_color(ColorDbl((double) (1 - dot(collision_normal, ray->get_direction())) * collision_material.get_color().get_rgb()));
+
+        // Set ray end point
         ray->set_end_point(new vec3(collision_pos.x, collision_pos.y, collision_pos.z));
 
-        if(ray->get_ray_iterations() > 5 && !reflect) return;
+        // Return if ray exceeds max iterations
+        if (ray->get_ray_iterations() > 5 && !reflect) return;
 
         // Create child rays
-        ReflectRay(ray, collision_normal);
-        TransmitRay(ray, collision_normal, true, ray->get_reflected_ray()->get_direction());
+        if (reflect) {
+            ReflectRay(ray, collision_normal);
+            TransmitRay(ray, collision_normal, true, ray->get_reflected_ray()->get_direction());
+        }
+
+        TraceShadowRays(ray, collision_pos);
 
         // Trace child rays
         if (ray->get_reflected_ray() != nullptr) TraceRay(ray->get_reflected_ray());
         if (ray->get_transmitted_ray() != nullptr) TraceRay(ray->get_transmitted_ray());
     }
 }
+
