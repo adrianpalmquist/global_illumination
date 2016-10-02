@@ -14,15 +14,25 @@ Renderer::Renderer() {
 void Renderer::Render() {
     scene->PrepareForRender();
 
+    std::vector<vec3> sampled_directions;
+    ColorDbl clr;
+    int counter;
+    vec3 direction;
     vec3 origin = camera.get_camera_position();
     for (int y = 0; y < Camera::CAMERA_HEIGHT; y++) {
         for (int x = 0; x < Camera::CAMERA_WIDTH; x++) {
-
-            Ray *parent_ray = new Ray(nullptr, new vec3(origin), camera.get_camera_direction(x,y), 0);
-            ray_tracer.StartRayTracing(parent_ray);
-            ColorDbl clr = ColorFromRayTree(parent_ray);
-            delete parent_ray;
-
+            sampled_directions = camera.get_camera_direction(x,y);
+            counter = 0;
+            clr.set_rgb(dvec3(0.0,0.0,0.0));
+            for (std::vector<vec3>::iterator it = sampled_directions.begin(); it != sampled_directions.end(); ++it) {
+                direction = *it;
+                Ray *parent_ray = new Ray(nullptr, new vec3(origin), direction, 0);
+                ray_tracer.StartRayTracing(parent_ray);
+                clr += ColorFromRayTree(parent_ray);
+                delete parent_ray;
+                counter++;
+            }
+            clr = clr/SS;
             camera.set_pixel_clr(x,y,clr);
         }
     }

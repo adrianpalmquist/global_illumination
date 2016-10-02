@@ -15,7 +15,7 @@ public:
 
     Camera();
     vec3 get_camera_position();
-    vec3 get_camera_direction(int x, int y);
+    std::vector<vec3> get_camera_direction(int x, int y);
     void set_pixel_clr(int x, int y, ColorDbl clr);
     ColorDbl get_pixel_clr(int x, int y);
 
@@ -35,11 +35,10 @@ private:
     vec3 camera_v4;
 
     // Function to retrieve pixels position on the camera plane
-    vec3 GetPixelPosition(int x, int y);
+    std::vector<vec3> GetPixelPositions(int x, int y);
 
     // Function to calculate camera plane
     void GetCameraPlane();
 };
-
 
 #endif //TNCG15_PROJ_CAMERA_H

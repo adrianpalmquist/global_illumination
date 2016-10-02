@@ -21,6 +21,10 @@ private:
     RayTracer ray_tracer;
 
     ColorDbl ColorFromRayTree(Ray *parentRay);
+
+    const float SS = 4.0;
+
 };
+
 
 #endif //TNCG15_PROJ_RENDERER_H

@@ -2,6 +2,7 @@
 // Created by Filip Kantedal on 23/09/16.
 //
 
+#include <iostream>
 #include "ColorDbl.h"
 
 ColorDbl::ColorDbl(double r, double g, double b) {
@@ -20,4 +21,16 @@ const double ColorDbl::get_clr_magnitude() const {
 
 void ColorDbl::set_rgb(dvec3 _rgb) {
     rgb = _rgb;
+}
+
+const ColorDbl& ColorDbl::operator+=(const ColorDbl& clrDbl) {
+    *this = this->get_rgb() + clrDbl.get_rgb();
+    return *this;
+}
+
+ColorDbl ColorDbl::operator/(const float& x) const{
+    ColorDbl temp(this->get_rgb().r/x,
+                  this->get_rgb().g/x,
+                  this->get_rgb().b/x);
+    return temp;
 }

@@ -27,6 +27,7 @@ public:
     void set_ray_color(ColorDbl _ray_clr);
 
     Ray* get_transmitted_ray();
+
     void set_transmitted_ray(Ray* _transmitted_ray);
 
     Ray* get_reflected_ray();
@@ -53,5 +54,5 @@ private:
     int ray_iteration;
 };
 
-
 #endif //TNCG15_PROJ_RAY_H
+
