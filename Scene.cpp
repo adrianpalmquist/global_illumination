@@ -38,13 +38,13 @@ void Scene::CreateDefaultScene() {
     BaseMaterial* light_material = new BaseMaterial(ColorDbl(1,1,1));
     light_material->enable_light_emission();
     light_material->set_light_color(ColorDbl(1,1,0.6));
-    light_material->set_light_power(50.0f);
-    vec3 *v13 = new vec3(10,-2,5);
-    vec3 *v14 = new vec3(10,2,5);
+    light_material->set_flux(3.0f);
+    vec3 *v13 = new vec3(10,-2,4);
+    vec3 *v14 = new vec3(10,2,4);
     vec3 *v15 = new vec3(12,-2,2);
     vec3 *v16 = new vec3(12,2,2);
     triangles.push_back(new Triangle(v13, v14, v15, light_material));
-    //triangles.push_back(new Triangle(v14, v16, v15, light_material));
+    triangles.push_back(new Triangle(v14, v16, v15, light_material));
 
     // Generate triangles (See image in assets folder)
 
@@ -118,11 +118,35 @@ bool Scene::RayIntersection(vec3 start_point, vec3 direction, vec3 &collision_po
     }
 
     if (collision) return true;
+
     return false;
 }
 
-std::vector<PointLight *> Scene::get_point_lights() {
-    return point_lights;
+bool Scene::RayIntersection(vec3 start_point, vec3 direction, vec3 &collision_pos) {
+    bool collision = false;
+
+    //Calculate triangle collision
+    for (std::vector<Triangle*>::iterator it = triangles.begin(); it != triangles.end(); ++it) {
+        Triangle *triangle = *it;
+        if (triangle->RayIntersection(start_point, direction, collision_pos)) {
+            collision = true;
+            break;
+        }
+    }
+
+    //Calculate sphere intersection
+    for (std::vector<Sphere*>::iterator it = spheres.begin(); it != spheres.end(); ++it) {
+        Sphere * sphere = *it;
+        vec3 collision_normal;
+        if (sphere->RayIntersection(start_point, direction, collision_pos, collision_normal)) {
+            collision = true;
+            break;
+        }
+    }
+
+    if (collision) return true;
+
+    return false;
 }
 
 void Scene::PrepareForRender() {

@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "Camera.h"
+#include "Renderer.h"
 
 
 Camera::Camera() {
@@ -22,50 +23,33 @@ Camera::Camera() {
 
 std::vector<vec3> Camera::GetPixelPositions(int x, int y) {
     std::vector<vec3> positions;
+
     vec3 base_vector_x = vec3(camera_v3) - vec3(camera_v4);
     vec3 base_vector_y = vec3(camera_v1) - vec3(camera_v4);
-    vec3 dx = base_vector_x / (float) CAMERA_WIDTH;
-    vec3 dy = base_vector_y / (float) CAMERA_HEIGHT;
-    vec3 vert1 = vec3(camera_v4) + (float) x / (float) CAMERA_WIDTH * base_vector_x + (float) y / (float) CAMERA_HEIGHT * base_vector_y;
-    vec3 vert2 = vert1 + dx/(float)2.0;
-    vec3 vert3 = vert2 + dx/(float)2.0;
-    vec3 vert4 = vert3 + dy/(float)2.0;
-    vec3 vert5 = vert4 + dy/(float)2.0;
-    vec3 vert6 = vert5 - dx/(float)2.0;
-    vec3 vert7 = vert6 - dx/(float)2.0;
-    vec3 vert8 = vert7 - dy/(float)2.0;
-    vec3 vert9 = vert8 + dx/(float)2.0;
 
-    //std::cout << "1: (" << vert1.r << ", " << vert1.g << ", " << vert1.b << ")" << std::endl;
-    //std::cout << "2: (" << vert2.r << ", " << vert2.g << ", " << vert2.b << ")" << std::endl;
+    vec3 dx = (base_vector_x / (float) CAMERA_WIDTH) / ((float) sqrt(Renderer::ANTI_ALIASING_SAMPLES));
+    vec3 dy = (base_vector_y / (float) CAMERA_HEIGHT) / ((float) sqrt(Renderer::ANTI_ALIASING_SAMPLES));
 
-    vec3 vect1 = vert2 - vert1;
-    vec3 vect2 = vert8 - vert1;
-    vec3 vect3 = vert3 - vert2;
-    vec3 vect4 = vert9 - vert2;
-    vec3 vect5 = vert4 - vert9;
-    vec3 vect6 = vert6 - vert9;
-    vec3 vect7 = vert9 - vert8;
-    vec3 vect8 = vert7 - vert8;
+    for (int sample_x = 0; sample_x < 2; sample_x++) {
+        for (int sample_y = 0; sample_y < 2; sample_y++) {
+            vec3 rand_x = dx * ((float) rand()/RAND_MAX);
+            vec3 rand_y = dy * ((float) rand()/RAND_MAX);
 
-    //std::cout << "(" << vect1.r << ", " << vect1.g << ", " << vect1.b << ")" << std::endl;
-
-
-    vec3 position1 = vert1 + vect1*(float)(rand()/RAND_MAX) + vect2*(float)(rand()/RAND_MAX);
-    vec3 position2 = vert2 + vect3*(float)(rand()/RAND_MAX) + vect4*(float)(rand()/RAND_MAX);
-    vec3 position3 = vert9 + vect5*(float)(rand()/RAND_MAX) + vect6*(float)(rand()/RAND_MAX);
-    vec3 position4 = vert8 + vect7*(float)(rand()/RAND_MAX) + vect8*(float)(rand()/RAND_MAX);
-
-
-    positions.push_back(position1);
-    positions.push_back(position2);
-    positions.push_back(position3);
-    positions.push_back(position4);
-
-    //std::cout << "(" << position1.r << ", " << position1.g << ", " << position1.b << ")" << std::endl;
-    //std::cout << "(" << positions.at(0).r << ", " << positions.at(0).g << ", " << positions.at(0).b << ")" << std::endl;
+            vec3 vert = vec3(camera_v4) + ((float) x + (sample_x / 2.0f)) / (float) CAMERA_WIDTH * base_vector_x
+                        + ((float)y + (sample_y / 2.0f)) / (float) CAMERA_HEIGHT * base_vector_y;
+            vert += rand_x + rand_y;
+            positions.push_back(normalize(vert - camera_position));
+        }
+    }
 
     return positions;
+}
+
+vec3 Camera::GetPixelPosition(int x, int y) {
+    vec3 base_vector_x = vec3(camera_v3) - vec3(camera_v4);
+    vec3 base_vector_y = vec3(camera_v1) - vec3(camera_v4);
+    vec3 vert = vec3(camera_v4) + (float) x / (float) CAMERA_WIDTH * base_vector_x + (float) y / (float) CAMERA_HEIGHT * base_vector_y;
+    return normalize(vert - camera_position);
 }
 
 
@@ -84,11 +68,15 @@ vec3 Camera::get_camera_position() {
 }
 
 std::vector<vec3> Camera::get_camera_direction(int x, int y) {
-    std::vector<vec3> sampled_positions = GetPixelPositions(x, y);
-    for (int i = 0; i < sampled_positions.size(); i++) {
-        sampled_positions.at(i) = normalize(sampled_positions.at(i) - camera_position);
+    // Check if anti aliasing is enabled
+    if (Renderer::ANTI_ALIASING) {
+        return GetPixelPositions(x,y);
     }
-    return sampled_positions;
+    else {
+        std::vector<vec3> sampled_positions;
+        sampled_positions.push_back(GetPixelPosition(x,y));
+        return sampled_positions;
+    }
 }
 
 void Camera::set_pixel_clr(int x, int y, ColorDbl clr) {
@@ -98,3 +86,4 @@ void Camera::set_pixel_clr(int x, int y, ColorDbl clr) {
 ColorDbl Camera::get_pixel_clr(int x, int y) {
     return camera_plane[x][y].get_clr();
 }
+

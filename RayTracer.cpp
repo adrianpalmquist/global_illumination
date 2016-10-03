@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "RayTracer.h"
+#include "Renderer.h"
 
 
 RayTracer::RayTracer() {}
@@ -58,37 +59,49 @@ void RayTracer::TransmitRay(Ray* ray, vec3 collision_normal, bool going_in, vec3
 }
 
 // Returns radiance contribution from light sources
-void RayTracer::TraceShadowRays(Ray *ray, vec3 collision_point) {
+ColorDbl RayTracer::TraceShadowRays(Ray *ray, vec3 collision_point) {
+    ColorDbl radiance_from_light = ColorDbl(0,0,0);
+
     std::vector<Triangle*> light_emitting_triangles = scene->get_light_emitting_triangles();
     for (std::vector<Triangle*>::iterator it = light_emitting_triangles.begin(); it != light_emitting_triangles.end(); ++it) {
         Triangle *triangle = *it;
+        BaseMaterial *emitting_material = triangle->get_material();
 
-        // Generate radom rays from collision point to surface
-        float ray_sum = .5;
-        int ray_num = 0;
+        // Generate random rays from collision point to surface
+        int ray_count = 0;
+        float radiance_factor = 0.0f;
+
         float u, v;
-        while (ray_num < NUM_SHADOW_RAYS) {
+        while (ray_count < Renderer::NUM_SHADOW_RAYS) {
+
+            // Randomize two points on the emission triangle using Baycentric coordinate
             u = ((float) rand() / (RAND_MAX)), v = ((float) rand() / (RAND_MAX));
+
+            // Check so that the coordinate sum is less than 1
             if (u + v < 1) {
                 vec3 ray_endpoint = triangle->BarycentricToCartesian(u, v);
                 vec3 ray_direction = ray_endpoint - collision_point;
-                vec3 ray_collision_pos, test1;
-                BaseMaterial collision_material;
-                bool test3;
+                vec3 ray_collision_pos;
 
-                if (scene->RayIntersection(collision_point, ray_direction, ray_collision_pos, test1, collision_material, test3)) {
-                    vec3 collision_vector = ray_collision_pos - collision_point;
-                    if (length(ray_direction) <= length(collision_vector) + 0.01) {
-                        ray_sum++;
+                if (scene->RayIntersection(collision_point, ray_direction, ray_collision_pos)) {
+                    float distance_to_light = length(ray_direction);
+                    float distance_to_collision = length(ray_collision_pos - collision_point);
+
+                    // Check if ray has collided with object before the emission triangle
+                    if (distance_to_light <= distance_to_collision + 0.01) {
+                        radiance_factor += emitting_material->get_flux() * 1.0f / pow(distance_to_light, 2.0f);
                     }
                 }
 
-                ray_num++;
+                ray_count++;
             }
         }
 
-        ray->set_ray_color(ColorDbl(ray->get_ray_color().get_rgb() * (0.5 * ((double) ray_sum / (NUM_SHADOW_RAYS+0.5)))));
+        // Add to radiance factor
+        radiance_factor /= (float) Renderer::NUM_SHADOW_RAYS;
+        radiance_from_light += emitting_material->get_light_color() * radiance_factor;
     }
+    return radiance_from_light;
 }
 
 void RayTracer::TraceRay(Ray *ray) {
@@ -97,9 +110,6 @@ void RayTracer::TraceRay(Ray *ray) {
     bool reflect; // Temporary, should consist of collision material instead
 
     if (scene->RayIntersection(*ray->get_start_point(), ray->get_direction(), collision_pos, collision_normal, collision_material, reflect)) {
-        // Temporary, set ray color to collision color
-        ray->set_ray_color(ColorDbl((double) (1 - dot(collision_normal, ray->get_direction())) * collision_material.get_color().get_rgb()));
-
         // Set ray end point
         ray->set_end_point(new vec3(collision_pos.x, collision_pos.y, collision_pos.z));
 
@@ -112,7 +122,13 @@ void RayTracer::TraceRay(Ray *ray) {
             TransmitRay(ray, collision_normal, true, ray->get_reflected_ray()->get_direction());
         }
 
-        TraceShadowRays(ray, collision_pos);
+        ColorDbl light_radiance_factor = TraceShadowRays(ray, collision_pos);
+        //std::cout << light_radiance_factor.get_rgb().r << std::endl;
+
+        // Temporary, set ray color to collision color
+
+        ray->set_ray_color((collision_material.get_color() * light_radiance_factor));
+        //ray->set_ray_color(light_radiance_factor);
 
         // Trace child rays
         if (ray->get_reflected_ray() != nullptr) TraceRay(ray->get_reflected_ray());

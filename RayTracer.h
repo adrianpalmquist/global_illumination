@@ -10,8 +10,6 @@
 
 class RayTracer {
 public:
-    static const int NUM_SHADOW_RAYS = 10;
-
     RayTracer();
     RayTracer(Scene* _scene);
     void StartRayTracing(Ray* base_ray);
@@ -22,7 +20,7 @@ private:
     void TraceRay(Ray* ray);
     void ReflectRay(Ray* ray, vec3 collision_normal);
     void TransmitRay(Ray* ray, vec3 collision_normal, bool going_in, vec3 reflected_direction);
-    void TraceShadowRays(Ray* ray, vec3 collision_point);
+    ColorDbl TraceShadowRays(Ray* ray, vec3 collision_point);
 };
 
 #endif //TNCG15_PROJ_RAYTRACER_H

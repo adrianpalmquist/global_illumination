@@ -23,10 +23,14 @@ public:
 
     const bool is_emitting_light();
     void enable_light_emission();
-    void set_light_color(ColorDbl _light_color);
-    void set_light_power(float _light_power);
 
-    // bool operator==(const BaseMaterial material);
+    void set_light_color(ColorDbl _light_color);
+    ColorDbl get_light_color();
+
+    void set_flux(float _flux);
+    float get_flux();
+
+    //virtual ColorDbl BRDF();
 private:
     ColorDbl color;
     float opacity;
@@ -35,7 +39,7 @@ private:
     // Light mission attributes
     bool light_emission_enabled;
     ColorDbl light_color;
-    float light_power;
+    float flux;
 };
 
 

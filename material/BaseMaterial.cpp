@@ -9,7 +9,7 @@ BaseMaterial::BaseMaterial() {
     specularity = 0.0f;
     opacity = 0.0f;
     light_emission_enabled = false;
-    light_power = 0.0f;
+    flux = 0.0f;
     light_color = ColorDbl(0.0, 0.0, 0.0);
 }
 
@@ -18,7 +18,7 @@ BaseMaterial::BaseMaterial(ColorDbl _color) {
     specularity = 0.0f;
     opacity = 0.0f;
     light_emission_enabled = false;
-    light_power = 0.0f;
+    flux = 0.0f;
     light_color = ColorDbl(0.0, 0.0, 0.0);
 }
 
@@ -42,7 +42,15 @@ void BaseMaterial::set_light_color(ColorDbl _light_color) {
     light_color = _light_color;
 }
 
-void BaseMaterial::set_light_power(float _light_power) {
-    light_power = _light_power;
+void BaseMaterial::set_flux(float _light_power) {
+    flux = _light_power;
+}
+
+float BaseMaterial::get_flux() {
+    return flux;
+}
+
+ColorDbl BaseMaterial::get_light_color() {
+    return light_color;
 }
 
