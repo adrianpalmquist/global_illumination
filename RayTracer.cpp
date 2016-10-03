@@ -17,11 +17,26 @@ void RayTracer::StartRayTracing(Ray *base_ray) {
 }
 
 void RayTracer::ReflectRay(Ray* ray, vec3 collision_normal) {
+    bool reflected = true;
+    vec3 reflected_direction;
     if (!(collision_normal.x == 0 && collision_normal.y == 0 && collision_normal.z == 0)) {
-        vec3 reflected_direction = normalize(ray->get_direction() - 2 * dot(ray->get_direction(), collision_normal) * collision_normal);
-        Ray *reflected_ray = new Ray(ray, ray->get_end_point(), reflected_direction, 1 + ray->get_ray_iterations());
-        ray->set_reflected_ray(reflected_ray);
+        reflected_direction = normalize(ray->get_direction() - 2 * dot(ray->get_direction(), collision_normal) * collision_normal);
+        // monte carlo
+        if (false) { // if diffuse reflector
+            if (rand()/RAND_MAX > 0.2) {
+                double azimuth = (2 * 3.14 * (rand()/RAND_MAX);
+                double inclination = acos(sqrt(rand()/RAND_MAX));
+                reflected_direction = vec3(cos(azimuth)*cos(inclination), sin(azimuth)*sin(inclination), cos(inclination));
+            }
+            else {
+                reflected = false;
+            }
+        }
     }
+
+    if (reflected) {
+    Ray *reflected_ray = new Ray(ray, ray->get_end_point(), reflected_direction, 1 + ray->get_ray_iterations());
+    ray->set_reflected_ray(reflected_ray);
 }
 
 void RayTracer::TransmitRay(Ray* ray, vec3 collision_normal, bool going_in, vec3 reflected_direction) {
