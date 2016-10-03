@@ -36,6 +36,7 @@ private:
 
     // Function to retrieve pixels position on the camera plane
     std::vector<vec3> GetPixelPositions(int x, int y);
+    vec3 GetPixelPosition(int x, int y);
 
     // Function to calculate camera plane
     void GetCameraPlane();

@@ -29,8 +29,22 @@ const ColorDbl& ColorDbl::operator+=(const ColorDbl& clrDbl) {
 }
 
 ColorDbl ColorDbl::operator/(const float& x) const{
-    ColorDbl temp(this->get_rgb().r/x,
-                  this->get_rgb().g/x,
-                  this->get_rgb().b/x);
-    return temp;
+    ColorDbl clr(this->get_rgb().r/x,
+                 this->get_rgb().g/x,
+                 this->get_rgb().b/x);
+    return clr;
+}
+
+ColorDbl ColorDbl::operator*(const float &factor) const {
+    ColorDbl clr(this->get_rgb().r * factor,
+                 this->get_rgb().g * factor,
+                 this->get_rgb().b * factor);
+    return clr;
+}
+
+ColorDbl ColorDbl::operator*(const ColorDbl &clr) const {
+    ColorDbl color(this->get_rgb().r * clr.get_rgb().r,
+                   this->get_rgb().g * clr.get_rgb().g,
+                   this->get_rgb().b * clr.get_rgb().b);
+    return color;
 }

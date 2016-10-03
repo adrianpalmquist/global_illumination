@@ -66,3 +66,11 @@ float Ray::get_radiance_distribution() {
     return radiance_distribution;
 }
 
+std::vector<Ray *> Ray::get_shadow_rays() {
+    return shadow_rays;
+}
+
+void Ray::add_shadow_ray(Ray *shadow_ray) {
+    shadow_rays.push_back(shadow_ray);
+}
+

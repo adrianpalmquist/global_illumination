@@ -36,10 +36,14 @@ public:
     float get_radiance_distribution();
     void set_radiance_distribution(float _radiance_distribution);
 
+    std::vector<Ray*> get_shadow_rays();
+    void add_shadow_ray(Ray* shadow_ray);
+
 private:
     Ray* parent_ray;
     Ray* reflected_ray;
     Ray* transmitted_ray;
+    std::vector<Ray*> shadow_rays;
 
     vec3 * start_point;
     vec3 * end_point;

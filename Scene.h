@@ -17,12 +17,16 @@ public:
     Scene();
     ~Scene();
 
-    bool RayIntersection(Ray* ray, vec3 &intersection_point, vec3 &collision_normal, bool &reflect);
+    bool RayIntersection(vec3 start_point, vec3 direction, vec3 &collision_pos, vec3 &collision_normal, BaseMaterial &collision_material, bool &reflect);
+    bool RayIntersection(vec3 start_point, vec3 direction, vec3 &collision_pos);
+    void PrepareForRender();
 
     std::vector<Triangle*> get_triangles();
+    std::vector<Triangle*> get_light_emitting_triangles();
     std::vector<Sphere*> get_spheres();
 private:
     std::vector<Triangle*> triangles;
+    std::vector<Triangle*> light_emitting_triangles; // Calucated before render
     std::vector<Sphere*> spheres;
 
     void CreateDefaultScene();

@@ -9,7 +9,7 @@ Triangle::Triangle() {}
 
 Triangle::~Triangle() {}
 
-Triangle::Triangle(vec3* _v1, vec3* _v2, vec3* _v3, ColorDbl* _clr) : v0(_v1), v1(_v2), v2(_v3), clr(_clr) {
+Triangle::Triangle(vec3* _v1, vec3* _v2, vec3* _v3, BaseMaterial* _material) : v0(_v1), v1(_v2), v2(_v3), material(_material) {
     calculateNormal();
 }
 
@@ -25,7 +25,7 @@ void Triangle::calculateNormal() {
 // Returns normal direction
 vec3 Triangle::get_normal() { return normal; }
 
-bool Triangle::rayIntersection(vec3 origin, vec3 direction, vec3 &intersection_point) {
+bool Triangle::RayIntersection(vec3 origin, vec3 direction, vec3 &intersection_point) {
     static const float EPS = 0.0001;
 
     vec3 v0v1(*v1 - *v0);
@@ -58,13 +58,17 @@ bool Triangle::rayIntersection(vec3 origin, vec3 direction, vec3 &intersection_p
     return false;
 }
 
-ColorDbl *Triangle::get_clr() {
-    return clr;
-}
-
 vec3 Triangle::get_reflection(vec3 direction, vec3 normal) {
     // float angle = acos(dot(direction,normal));
     vec3 reflected = normalize(direction - 2 * dot(direction,normal) * normal);
 
     return reflected;
+}
+
+BaseMaterial *Triangle::get_material() {
+    return material;
+}
+
+vec3 Triangle::BarycentricToCartesian(float u, float v) {
+    return (1 - u - v) * (*v0) + u * (*v1) + v * (*v2);
 }
