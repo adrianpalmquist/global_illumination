@@ -42,8 +42,8 @@ void Renderer::Render() {
             }
         }
 
-        std::cout << "Path tracing iteration number: " <<  pathtracing_sample++ << std::endl;
-        CreateImage(pathtracing_sample++);
+        std::cout << "Path tracing iteration number: " <<  pathtracing_sample + 1 << std::endl;
+        CreateImage(pathtracing_sample + 1);
 
     }
 }
