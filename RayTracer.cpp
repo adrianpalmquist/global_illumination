@@ -82,14 +82,12 @@ void RayTracer::TraceRay(Ray *ray) {
         //TransmitRay(ray, collision_normal, true, ray->get_reflected_ray()->get_direction());
 
 
-        ColorDbl light_radiance_factor = TraceShadowRays(ray, collision_pos);
-        //std::cout << light_radiance_factor.get_rgb().r << std::endl;
-
-        // Temporary, set ray color to collision color
-
-        //ray->set_ray_color(collision_material->get_color());
-        ray->set_ray_color((collision_material->get_color() * light_radiance_factor));
-        //ray->set_ray_color(light_radiance_factor);
+        if (!collision_material->is_emitting_light()) {
+            ColorDbl light_radiance = TraceShadowRays(ray, collision_pos);
+            ray->set_ray_color((collision_material->get_color() * light_radiance));
+        }
+        else
+            ray->set_ray_color(collision_material->get_light_color() * collision_material->get_flux());
 
         // Trace child rays
         if (ray->get_reflected_ray() != nullptr) TraceRay(ray->get_reflected_ray());

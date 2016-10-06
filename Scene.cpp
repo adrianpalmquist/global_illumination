@@ -41,7 +41,7 @@ void Scene::CreateDefaultScene() {
     BaseMaterial* light_material = new DiffuseMaterial(ColorDbl(1,1,1));
     light_material->enable_light_emission();
     light_material->set_light_color(ColorDbl(1,1,0.6));
-    light_material->set_flux(3.0f);
+    light_material->set_flux(6.0f);
     vec3 *v13 = new vec3(10,-2,4);
     vec3 *v14 = new vec3(10,2,4);
     vec3 *v15 = new vec3(12,-2,2);
