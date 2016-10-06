@@ -16,6 +16,7 @@ public:
     static const int ANTI_ALIASING_SAMPLES = 4;
     static const int NUM_SHADOW_RAYS = 5;
     static const int PATHTRACING_SAMPLES = 10;
+    int progress_indicator = -1;
 
     Renderer();
     void Render();
@@ -26,6 +27,8 @@ private:
     RayTracer ray_tracer;
 
     ColorDbl ColorFromRayTree(Ray *parentRay);
+    Ray* Traverse(Ray *ray);
+    void progessIndicator(double progress);
 };
 
 

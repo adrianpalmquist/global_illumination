@@ -8,6 +8,7 @@ Ray::Ray(Ray* _parent_ray, vec3 *_start_point, vec3 _direction, int _ray_iterati
 : parent_ray(_parent_ray), start_point(_start_point), direction(_direction), ray_iteration(_ray_iteration) {
     reflected_ray = 0;
     transmitted_ray = 0;
+    ray_clr = ColorDbl(0,0,0);
 }
 
 Ray::~Ray() {
@@ -72,5 +73,13 @@ std::vector<Ray *> Ray::get_shadow_rays() {
 
 void Ray::add_shadow_ray(Ray *shadow_ray) {
     shadow_rays.push_back(shadow_ray);
+}
+
+Ray *Ray::get_parent_ray() {
+    return parent_ray;
+}
+
+void Ray::add_ray_color(ColorDbl _ray_clr) {
+    ray_clr += _ray_clr;
 }
 

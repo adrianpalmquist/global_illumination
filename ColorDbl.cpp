@@ -48,3 +48,8 @@ ColorDbl ColorDbl::operator*(const ColorDbl &clr) const {
                    this->get_rgb().b * clr.get_rgb().b);
     return color;
 }
+
+ColorDbl operator+(ColorDbl lhs, const ColorDbl &rhs) {
+    lhs += rhs;
+    return lhs;
+}

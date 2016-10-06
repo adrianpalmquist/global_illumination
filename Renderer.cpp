@@ -36,7 +36,7 @@ void Renderer::Render() {
                     delete parent_ray;
                 }
             }
-
+            progessIndicator(((double)(x+y*Camera::CAMERA_HEIGHT))/( (double)(Camera::CAMERA_HEIGHT * Camera::CAMERA_WIDTH)));
             pixel_color = pixel_color / ((float) PATHTRACING_SAMPLES);
             camera.set_pixel_clr(x,y,pixel_color);
         }
@@ -44,13 +44,51 @@ void Renderer::Render() {
 }
 
 ColorDbl Renderer::ColorFromRayTree(Ray *parentRay) {
+    /*ColorDbl reflectedRayColor;
+    ColorDbl transmittedRayColor;
     Ray* currentRay = parentRay;
-    while (currentRay->get_reflected_ray() != 0) {
-        currentRay = currentRay->get_reflected_ray();
+    float radianceDistribution = 1.0;
+    while (currentRay->get_reflected_ray() != nullptr) {
+        reflectedRayColor = currentRay->get_reflected_ray()->get_ray_color();
+        radianceDistribution = currentRay->get_reflected_ray()->get_radiance_distribution();
+        if (currentRay->get_transmitted_ray() != nullptr) {
+            transmittedRayColor = currentRay->get_transmitted_ray()->get_ray_color();
+        } else {
+            transmittedRayColor = ColorDbl(0.0, 0.0, 0.0);
+        }
     }
-    return currentRay->get_ray_color();
+    return (reflectedRayColor * radianceDistribution) + (transmittedRayColor * (1-radianceDistribution));*/
+
+    Ray* ray = Traverse(parentRay);
+    //assert(ray != nullptr);
+    //std::cout << "Color: " << ray->get_ray_color().get_rgb().r<< ray->get_ray_color().get_rgb().g << ray->get_ray_color().get_rgb().b << std::endl;
+    return ray->get_ray_color();
 }
 
+
+Ray* Renderer::Traverse(Ray* ray) {
+    if (ray != nullptr){
+        Traverse(ray->get_reflected_ray());
+        Traverse(ray->get_transmitted_ray());
+        if (ray->get_parent_ray() != nullptr) {
+            ray->get_parent_ray()->add_ray_color(ray->get_ray_color() * ray->get_radiance_distribution());
+        }
+    }
+
+    /*if (ray->get_reflected_ray() != nullptr) {
+        Traverse(ray->get_reflected_ray());
+    }
+    if(ray->get_transmitted_ray() != nullptr) {
+        Traverse(ray->get_transmitted_ray());
+    }
+    if (ray->get_parent_ray() != nullptr) {
+        ray->get_parent_ray()->add_ray_color(ray->get_ray_color() * ray->get_radiance_distribution());
+    }*/
+
+    //clr += Traverse(ray->get_reflected_ray());
+    //clr += Traverse(ray->get_transmitted_ray());
+    return ray;
+}
 
 void Renderer::CreateImage() {
     double max = 0.0;
@@ -84,4 +122,21 @@ void Renderer::CreateImage() {
         }
     }
     (void) fclose(fp);
+}
+
+void Renderer::progessIndicator(double progress) {
+    int barWidth = 70;
+    int pos = (int) (barWidth * progress);
+    if (progress_indicator != pos) {
+        std::cout.flush();
+        std::cout << "[";
+            for (int i = 0; i < barWidth; ++i) {
+                if (i < pos) std::cout << "=";
+                else if (i == pos) std::cout << ">";
+                else std::cout << " ";
+            }
+            std::cout << "] " << int(progress * 100.0) << " %\r";
+            std::cout << std::endl;
+        progress_indicator = pos;
+    }
 }

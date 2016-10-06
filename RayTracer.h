@@ -18,8 +18,6 @@ private:
     Ray* ray_tree;
 
     void TraceRay(Ray* ray);
-    void ReflectRay(Ray* ray, vec3 collision_normal);
-    void TransmitRay(Ray* ray, vec3 collision_normal, bool going_in, vec3 reflected_direction);
     ColorDbl TraceShadowRays(Ray* ray, vec3 collision_point);
 };
 

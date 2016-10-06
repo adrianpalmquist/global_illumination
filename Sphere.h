@@ -5,8 +5,6 @@
 #ifndef TNCG15_PROJ_SPHERE_H
 #define TNCG15_PROJ_SPHERE_H
 
-#include "glm/glm.hpp"
-#include "ColorDbl.h"
 #include "material/BaseMaterial.h"
 
 using namespace glm;

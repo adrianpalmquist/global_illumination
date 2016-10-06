@@ -42,6 +42,6 @@ float Sphere::get_radius() {
     return radius;
 }
 
-BaseMaterial* Sphere::get_material() {
+BaseMaterial * Sphere::get_material() {
     return material;
 }
