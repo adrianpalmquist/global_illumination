@@ -10,7 +10,9 @@
 #include "Triangle.h"
 #include "Sphere.h"
 
-class Ray; // Forward declaration to avoid circular referencing
+// Forward declaration to avoid circular referencing
+class Ray;
+class PhotonMapper;
 
 class Scene {
 public:
@@ -25,6 +27,7 @@ public:
     std::vector<Triangle*> get_light_emitting_triangles();
     std::vector<Sphere*> get_spheres();
 private:
+    //PhotonMapper photonMapper;
     std::vector<Triangle*> triangles;
     std::vector<Triangle*> light_emitting_triangles; // Calucated before render
     std::vector<Sphere*> spheres;

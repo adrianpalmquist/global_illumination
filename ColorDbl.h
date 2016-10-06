@@ -19,6 +19,7 @@ public:
     ColorDbl operator/(const float& x) const;
     ColorDbl operator*(const float& x) const;
     ColorDbl operator*(const ColorDbl& clr) const;
+    ColorDbl operator+(const ColorDbl& clr) const;
 
     const dvec3 get_rgb() const;
     void set_rgb(dvec3 _rgb);
