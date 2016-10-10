@@ -20,6 +20,7 @@ public:
 private:
     Scene* scene;
     PhotonKdTree* photon_tree;
+    std::vector<Triangle*> emitting_triangles;
 
     // Used when distributing photons from plane emitters
     vec3 CosineDistributeDirection(vec3 normal);

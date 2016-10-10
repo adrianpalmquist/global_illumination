@@ -112,7 +112,7 @@ bool Scene::RayIntersection(vec3 start_point, vec3 direction, vec3 &collision_po
         if (sphere->RayIntersection(start_point, direction, collision_pos, collision_normal)) {
             collision_material = *sphere->get_material();
             collision = true;
-            reflect = true;
+            reflect = false;
             break;
         }
     }

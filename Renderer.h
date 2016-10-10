@@ -16,6 +16,8 @@ public:
     static const int ANTI_ALIASING_SAMPLES = 4;
     static const int NUM_SHADOW_RAYS = 5;
     static const int PATH_TRACING_MAX_SAMPLES = 1000;
+    static const bool PHOTON_MAPPING = true;
+    static const int NUM_PHOTONS = 1000000;
 
     Renderer();
     void Render();

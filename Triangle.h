@@ -21,6 +21,8 @@ public:
     vec3 get_normal();
     vec3 get_reflection(vec3 direction, vec3 normal);
     BaseMaterial* get_material();
+
+    vec3 RandomizePointOnTriangle();
 private:
     vec3* v0;
     vec3* v1;

@@ -3,6 +3,7 @@
 //
 
 #include "PhotonMapper.h"
+#include "../Renderer.h"
 
 PhotonMapper::PhotonMapper(Scene *_scene) : scene(_scene) {}
 
@@ -27,4 +28,23 @@ vec3 PhotonMapper::CosineDistributeDirection(vec3 normal) {
 }
 
 void PhotonMapper::Start() {
+    std::vector<Photon> photons;
+    emitting_triangles = scene->get_light_emitting_triangles();
+
+    // Calculate how many photons each emitter will emit
+    int photons_per_emitter = (int) (Renderer::NUM_PHOTONS / (emitting_triangles.size() + 1));
+    for (std::vector<Triangle*>::iterator it = emitting_triangles.begin(); it != emitting_triangles.end(); ++it) {
+        Triangle *triangle = *it;
+
+        int emitted_photons = 0;
+        while (emitted_photons < photons_per_emitter) {
+            vec3 emission_pos = triangle->RandomizePointOnTriangle();
+            vec3 emission_direction = CosineDistributeDirection(triangle->get_normal());
+
+            vec3 collision_pos;
+            scene->RayIntersection(emission_pos, emission_direction, collision_pos);
+            emitted_photons++;
+        }
+    }
+
 }
