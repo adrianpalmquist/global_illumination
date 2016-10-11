@@ -35,7 +35,6 @@ void Renderer::Render() {
                     pixel_color += ColorFromRayTree(parent_ray) / ((float) ANTI_ALIASING_SAMPLES);
                     delete parent_ray;
                 }
-
                 //progessIndicator(((double)(x+y*Camera::CAMERA_HEIGHT))/( (double)(Camera::CAMERA_HEIGHT * Camera::CAMERA_WIDTH)));
                 //pixel_color = pixel_color / ((float) PATH_TRACING_MAX_SAMPLES);
                 camera.set_pixel_clr(x, y,  pixel_color + camera.get_pixel_clr(x,y));
@@ -78,19 +77,6 @@ Ray* Renderer::Traverse(Ray* ray) {
             ray->get_parent_ray()->add_ray_color(ray->get_ray_color() * ray->get_radiance_distribution());
         }
     }
-
-    /*if (ray->get_reflected_ray() != nullptr) {
-        Traverse(ray->get_reflected_ray());
-    }
-    if(ray->get_transmitted_ray() != nullptr) {
-        Traverse(ray->get_transmitted_ray());
-    }
-    if (ray->get_parent_ray() != nullptr) {
-        ray->get_parent_ray()->add_ray_color(ray->get_ray_color() * ray->get_radiance_distribution());
-    }*/
-
-    //clr += Traverse(ray->get_reflected_ray());
-    //clr += Traverse(ray->get_transmitted_ray());
     return ray;
 }
 
@@ -110,7 +96,7 @@ void Renderer::CreateImage(int pathtracing_iteration) {
 //        }
 //    }
 
-    FILE *fp = fopen("render.ppm", "wb"); /* b - binary mode */
+    FILE *fp = fopen("render2.ppm", "wb"); /* b - binary mode */
     (void) fprintf(fp, "P6\n%d %d\n255\n", Camera::CAMERA_WIDTH, Camera::CAMERA_HEIGHT);
     static unsigned char color[3];
     double temp_r, temp_g, temp_b;

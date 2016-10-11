@@ -36,6 +36,7 @@ void Scene::CreateDefaultScene() {
     BaseMaterial* diffuse_yellow_material = new DiffuseMaterial(ColorDbl(1,1,0));
     BaseMaterial* diffuse_white_material = new DiffuseMaterial(ColorDbl(1,1,1));
     BaseMaterial* specular_white_material = new SpecularMaterial(ColorDbl(1,1,1));
+    specular_white_material->set_transparent();
 
     // Light source
     BaseMaterial* light_material = new DiffuseMaterial(ColorDbl(1,1,1));
@@ -118,9 +119,8 @@ bool Scene::RayIntersection(vec3 start_point, vec3 direction, vec3 &collision_po
         }
     }
 
-    if (collision) return true;
+    return collision;
 
-    return false;
 }
 
 bool Scene::RayIntersection(vec3 start_point, vec3 direction, vec3 &collision_pos) {
@@ -145,9 +145,8 @@ bool Scene::RayIntersection(vec3 start_point, vec3 direction, vec3 &collision_po
         }
     }
 
-    if (collision) return true;
+    return collision;
 
-    return false;
 }
 
 void Scene::PrepareForRender() {

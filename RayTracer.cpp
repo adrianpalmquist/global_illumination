@@ -78,11 +78,8 @@ void RayTracer::TraceRay(Ray *ray) {
 
         // Create child rays
         collision_material->BRDF(ray, collision_normal);
-        //ReflectRay(ray, collision_normal);
-        //TransmitRay(ray, collision_normal, true, ray->get_reflected_ray()->get_direction());
 
-
-        if (!collision_material->is_emitting_light()) {
+        if (!collision_material->is_emitting_light() && !collision_material->is_transparent()) {
             ColorDbl light_radiance = TraceShadowRays(ray, collision_pos);
             ray->set_ray_color((collision_material->get_color() * light_radiance));
         }

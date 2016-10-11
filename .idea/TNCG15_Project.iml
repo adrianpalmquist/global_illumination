@@ -2,10 +2,14 @@
 <module type="CPP_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/ColorDbl.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Renderer.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Pixel.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/RayTracer.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Ray.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Camera.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/material/DiffuseMaterial.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/material/DiffuseMaterial.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/material/SpecularMaterial.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/material/SpecularMaterial.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/material/BaseMaterial.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/material/BaseMaterial.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Scene.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/RayTracer.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
@@ -13,21 +17,23 @@
       <sourceFolder url="file://$MODULE_DIR$/Renderer.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Ray.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Scene.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Triangle.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Ray.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Renderer.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/photon_mapping/PhotonKdTree.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/photon_mapping/PhotonMapper.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/photon_mapping/PhotonMapper.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/photon_mapping/PhotonKdTree.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/photon_mapping/Photon.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/photon_mapping/Photon.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Triangle.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Camera.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Pixel.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Triangle.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Sphere.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/ColorDbl.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/main.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/ColorDbl.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/ColorDbl.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Camera.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Sphere.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/material/DiffuseMaterial.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/material/DiffuseMaterial.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/material/SpecularMaterial.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/material/SpecularMaterial.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/material/BaseMaterial.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/material/BaseMaterial.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/RayTracer.h" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
