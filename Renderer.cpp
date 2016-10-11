@@ -33,9 +33,12 @@ void Renderer::Render() {
                     Ray *parent_ray = new Ray(nullptr, new vec3(origin), direction, 0);
                     ray_tracer.StartRayTracing(parent_ray);
                     pixel_color += ColorFromRayTree(parent_ray) / ((float) ANTI_ALIASING_SAMPLES);
+
+                    // TODO: Destructor to delete all rays
                     delete parent_ray;
                 }
 
+                //progessIndicator(((double)(x+y*Camera::CAMERA_HEIGHT))/( (double)(Camera::CAMERA_HEIGHT * Camera::CAMERA_WIDTH)));
                 //pixel_color = pixel_color / ((float) PATH_TRACING_MAX_SAMPLES);
                 camera.set_pixel_clr(x, y,  pixel_color + camera.get_pixel_clr(x,y));
             }
@@ -43,15 +46,15 @@ void Renderer::Render() {
 
         std::cout << "Path tracing iteration number: " <<  pathtracing_sample + 1 << std::endl;
         CreateImage(pathtracing_sample + 1);
+
     }
 }
 
 ColorDbl Renderer::ColorFromRayTree(Ray *parentRay) {
-    Ray* currentRay = parentRay;
-    while (currentRay->get_reflected_ray() != 0) {
-        currentRay = currentRay->get_reflected_ray();
-    }
-    return currentRay->get_ray_color();
+    Ray* ray = Traverse(parentRay);
+    //assert(ray != nullptr);
+    //std::cout << "Color: " << ray->get_ray_color().get_rgb().r<< ray->get_ray_color().get_rgb().g << ray->get_ray_color().get_rgb().b << std::endl;
+    return ray->get_ray_color();
 }
 
 double clamp(double input, double min, double max) {
@@ -64,6 +67,29 @@ double clamp(double input, double min, double max) {
     return input;
 }
 
+Ray* Renderer::Traverse(Ray* ray) {
+    if (ray != nullptr) {
+        Traverse(ray->get_reflected_ray());
+        Traverse(ray->get_transmitted_ray());
+        if (ray->get_parent_ray() != nullptr) {
+            ray->get_parent_ray()->add_ray_color(ray->get_ray_color() * ray->get_radiance_distribution());
+        }
+    }
+
+    /*if (ray->get_reflected_ray() != nullptr) {
+        Traverse(ray->get_reflected_ray());
+    }
+    if(ray->get_transmitted_ray() != nullptr) {
+        Traverse(ray->get_transmitted_ray());
+    }
+    if (ray->get_parent_ray() != nullptr) {
+        ray->get_parent_ray()->add_ray_color(ray->get_ray_color() * ray->get_radiance_distribution());
+    }*/
+
+    //clr += Traverse(ray->get_reflected_ray());
+    //clr += Traverse(ray->get_transmitted_ray());
+    return ray;
+}
 
 void Renderer::CreateImage(int pathtracing_iteration) {
     double max = 0.0;
@@ -99,4 +125,21 @@ void Renderer::CreateImage(int pathtracing_iteration) {
         }
     }
     (void) fclose(fp);
+}
+
+void Renderer::progessIndicator(double progress) {
+    int barWidth = 70;
+    int pos = (int) (barWidth * progress);
+    if (progress_indicator != pos) {
+        std::cout.flush();
+        std::cout << "[";
+        for (int i = 0; i < barWidth; ++i) {
+            if (i < pos) std::cout << "=";
+            else if (i == pos) std::cout << ">";
+            else std::cout << " ";
+        }
+        std::cout << "] " << int(progress * 100.0) << " %\r";
+        std::cout << std::endl;
+        progress_indicator = pos;
+    }
 }

@@ -36,8 +36,12 @@ bool Sphere::RayIntersection(vec3 origin, vec3 direction, vec3 &intersection_poi
             }
         }
 
-        if (intersections.size() != 0) {
-            intersection_point = intersections.at(0);
+        if (intersections.size() > 0) {
+            if (intersections.size() > 1)
+                intersection_point = intersections.at(1);
+            else
+                intersection_point = intersections.at(0);
+
             normal = (intersection_point - position) / radius;
             return true;
         }
@@ -57,6 +61,6 @@ float Sphere::get_radius() {
     return radius;
 }
 
-BaseMaterial* Sphere::get_material() {
+BaseMaterial * Sphere::get_material() {
     return material;
 }

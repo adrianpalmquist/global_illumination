@@ -18,6 +18,8 @@ public:
     static const int PATH_TRACING_MAX_SAMPLES = 1000;
     static const bool PHOTON_MAPPING = true;
     static const int NUM_PHOTONS = 1000000;
+    static const int PATHTRACING_SAMPLES = 10;
+    int progress_indicator = -1;
 
     Renderer();
     void Render();
@@ -28,6 +30,8 @@ private:
     RayTracer ray_tracer;
 
     ColorDbl ColorFromRayTree(Ray *parentRay);
+    Ray* Traverse(Ray *ray);
+    void progessIndicator(double progress);
 };
 
 

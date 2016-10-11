@@ -6,8 +6,17 @@
 #define TNCG15_PROJ_SPECULARMATERIAL_H
 
 
-class SpecularMaterial {
+#include "BaseMaterial.h"
 
+class SpecularMaterial : public BaseMaterial {
+public:
+    SpecularMaterial(ColorDbl _color) : BaseMaterial(_color){};
+
+    void BRDF(Ray* ray, vec3 collision_normal);
+
+private:
+    vec3 ReflectRay(Ray* ray, vec3 collision_normal);
+    void TransmitRay(Ray* ray, vec3 collision_normal, vec3 reflected_direction);
 };
 
 

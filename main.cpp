@@ -4,7 +4,7 @@
 
 int main() {
     srand (time(NULL));
-
+    
     Renderer r = Renderer();
     r.Render();
     //r.CreateImage();

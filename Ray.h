@@ -6,8 +6,10 @@
 #define TNCG15_PROJ_RAY_H
 
 
+#include <vector>
 #include "glm/glm.hpp"
-#include "Scene.h"
+#include "ColorDbl.h"
+//#include "Scene.h"
 
 using namespace glm;
 
@@ -25,6 +27,7 @@ public:
 
     ColorDbl get_ray_color();
     void set_ray_color(ColorDbl _ray_clr);
+    void add_ray_color(ColorDbl _ray_clr);
 
     Ray* get_transmitted_ray();
 
@@ -38,6 +41,8 @@ public:
 
     std::vector<Ray*> get_shadow_rays();
     void add_shadow_ray(Ray* shadow_ray);
+
+    Ray* get_parent_ray();
 
 private:
     Ray* parent_ray;

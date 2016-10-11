@@ -7,6 +7,7 @@
 
 
 #include "../ColorDbl.h"
+#include "../Ray.h"
 
 class BaseMaterial {
 public:
@@ -16,7 +17,7 @@ public:
     static const int EMITTING = 3;
 
     BaseMaterial();
-    BaseMaterial(ColorDbl _color);
+    explicit BaseMaterial(ColorDbl _color);
 
     const ColorDbl get_color() const;
     void set_color(ColorDbl _color);
@@ -30,7 +31,7 @@ public:
     void set_flux(float _flux);
     float get_flux();
 
-    //virtual ColorDbl BRDF();
+    virtual void BRDF(Ray* ray, vec3 collision_normal) = 0;
 private:
     ColorDbl color;
     float opacity;

@@ -19,7 +19,7 @@ public:
     Scene();
     ~Scene();
 
-    bool RayIntersection(vec3 start_point, vec3 direction, vec3 &collision_pos, vec3 &collision_normal, BaseMaterial &collision_material, bool &reflect);
+    bool RayIntersection(vec3 start_point, vec3 direction, vec3 &collision_pos, vec3 &collision_normal, BaseMaterial *&collision_material);
     bool RayIntersection(vec3 start_point, vec3 direction, vec3 &collision_pos);
     void PrepareForRender();
 
