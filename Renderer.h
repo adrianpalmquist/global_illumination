@@ -9,16 +9,19 @@
 #include "Ray.h"
 #include "Camera.h"
 #include "RayTracer.h"
+#include "photon_mapping/PhotonMapper.h"
 
 class Renderer {
 public:
     static const bool ANTI_ALIASING = false;
     static const int ANTI_ALIASING_SAMPLES = 4;
     static const int NUM_SHADOW_RAYS = 5;
-    static const int PATH_TRACING_MAX_SAMPLES = 1000;
-    static const bool PHOTON_MAPPING = true;
-    static const int NUM_PHOTONS = 1000000;
-    static const int PATHTRACING_SAMPLES = 10;
+    static const int PATHTRACING_SAMPLES = 1;
+
+    // Photon mapping settings
+    static const int NUM_PHOTONS = 100000;
+    static constexpr float PHOTON_RADIUS = 0.2f;
+
     int progress_indicator = -1;
 
     Renderer();
@@ -27,6 +30,7 @@ public:
 private:
     Scene *scene;
     Camera camera;
+    PhotonMapper photon_mapper;
     RayTracer ray_tracer;
 
     ColorDbl ColorFromRayTree(Ray *parentRay);

@@ -12,7 +12,6 @@
 
 // Forward declaration to avoid circular referencing
 class Ray;
-class PhotonMapper;
 
 class Scene {
 public:

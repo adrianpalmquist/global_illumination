@@ -5,14 +5,21 @@
 #ifndef TNCG15_PROJ_PHOTON_H
 #define TNCG15_PROJ_PHOTON_H
 
-#include "../glm/glm.hpp"
 
-using namespace glm;
+#include "../ColorDbl.h"
 
 class Photon {
 public:
-    Photon(vec3 _collision_pos, vec3 collision_direction);
+    Photon(ColorDbl _radiance, vec3 _position, vec3 _direction): radiance(_radiance), position(_position), direction(_direction) {};
+
+    vec3 get_position() { return position; }
+    ColorDbl get_radiance() { return radiance; }
+
+    const bool operator==(Photon& photon);
 private:
+    vec3 position;
+    vec3 direction;
+    ColorDbl radiance;
 };
 
 

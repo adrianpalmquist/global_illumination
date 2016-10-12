@@ -12,7 +12,7 @@ class DiffuseMaterial : public BaseMaterial {
 public:
     DiffuseMaterial(ColorDbl _color) : BaseMaterial(_color) { };
 
-    void BRDF(Ray* ray, vec3 collision_normal);
+    virtual void BRDF(Ray* ray, vec3 collision_normal);
 };
 
 

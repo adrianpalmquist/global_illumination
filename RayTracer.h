@@ -7,19 +7,25 @@
 
 #include "Scene.h"
 #include "Ray.h"
+#include "photon_mapping/Photon.h"
+#include "photon_mapping/PhotonOctree.h"
 
 class RayTracer {
 public:
     RayTracer();
     RayTracer(Scene* _scene);
     void StartRayTracing(Ray* base_ray);
+    ColorDbl TraceRay(Ray* ray);
+
+    void set_photon_map(PhotonOctree* _photon_map);
+
 private:
     Scene* scene;
     Ray* ray_tree;
+    PhotonOctree* photon_map;
 
-    void TraceRay(Ray* ray);
     ColorDbl TraceShadowRays(Ray* ray, vec3 collision_point);
-    float CalculateIntensityFactor(float distance);
+    ColorDbl MeanFromPhotonMap(vec3 position);
 };
 
 #endif //TNCG15_PROJ_RAYTRACER_H

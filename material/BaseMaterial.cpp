@@ -11,6 +11,7 @@ BaseMaterial::BaseMaterial() {
     light_emission_enabled = false;
     flux = 0.0f;
     light_color = ColorDbl(0.0, 0.0, 0.0);
+    transparent = false;
 }
 
 BaseMaterial::BaseMaterial(ColorDbl _color) {
@@ -20,6 +21,7 @@ BaseMaterial::BaseMaterial(ColorDbl _color) {
     light_emission_enabled = false;
     flux = 0.0f;
     light_color = ColorDbl(0.0, 0.0, 0.0);
+    transparent = false;
 }
 
 const ColorDbl BaseMaterial::get_color() const {
@@ -52,5 +54,13 @@ float BaseMaterial::get_flux() {
 
 ColorDbl BaseMaterial::get_light_color() {
     return light_color;
+}
+
+const bool BaseMaterial::is_transparent() {
+    return transparent;
+}
+
+void BaseMaterial::set_transparent() {
+    transparent = true;
 }
 

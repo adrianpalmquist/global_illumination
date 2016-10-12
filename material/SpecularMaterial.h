@@ -10,9 +10,9 @@
 
 class SpecularMaterial : public BaseMaterial {
 public:
-    SpecularMaterial(ColorDbl _color) : BaseMaterial(_color){};
+    SpecularMaterial(ColorDbl _color) : BaseMaterial(_color) { };
 
-    void BRDF(Ray* ray, vec3 collision_normal);
+    virtual void BRDF(Ray* ray, vec3 collision_normal);
 
 private:
     vec3 ReflectRay(Ray* ray, vec3 collision_normal);

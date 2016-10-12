@@ -31,7 +31,10 @@ public:
     void set_flux(float _flux);
     float get_flux();
 
-    virtual void BRDF(Ray* ray, vec3 collision_normal) = 0;
+    const bool is_transparent();
+    void set_transparent();
+
+    virtual void BRDF(Ray* ray, vec3 collision_normal)=0;
 private:
     ColorDbl color;
     float opacity;
@@ -39,6 +42,7 @@ private:
 
     // Light mission attributes
     bool light_emission_enabled;
+    bool transparent;
     ColorDbl light_color;
     float flux;
 };

@@ -35,19 +35,18 @@ void Scene::CreateDefaultScene() {
     BaseMaterial* diffuse_blue_material = new DiffuseMaterial(ColorDbl(0,0,1));
     BaseMaterial* diffuse_yellow_material = new DiffuseMaterial(ColorDbl(1,1,0));
     BaseMaterial* diffuse_white_material = new DiffuseMaterial(ColorDbl(1,1,1));
-    BaseMaterial* specular_white_material = new SpecularMaterial(ColorDbl(1,1,1));
-    BaseMaterial* specular_red_material = new SpecularMaterial(ColorDbl(1,0,0));
-    BaseMaterial* specular_green_material = new SpecularMaterial(ColorDbl(0,1,0));
+    BaseMaterial* specular_white_material = new SpecularMaterial(ColorDbl(1,0,0));
+    specular_white_material->set_transparent();
 
     // Light source
     BaseMaterial* light_material = new DiffuseMaterial(ColorDbl(1,1,1));
     light_material->enable_light_emission();
     light_material->set_light_color(ColorDbl(1,1,0.6));
     light_material->set_flux(6.0f);
-    vec3 *v13 = new vec3(8, -2, 4.9);
-    vec3 *v14 = new vec3(8,  2, 4.9);
-    vec3 *v15 = new vec3(12, -2, 4.9);
-    vec3 *v16 = new vec3(12,  2, 4.9);
+    vec3 *v13 = new vec3(10,-2,4);
+    vec3 *v14 = new vec3(10,2,4);
+    vec3 *v15 = new vec3(12,-2,2);
+    vec3 *v16 = new vec3(12,2,2);
     triangles.push_back(new Triangle(v13, v14, v15, light_material));
     triangles.push_back(new Triangle(v14, v16, v15, light_material));
 
@@ -82,8 +81,8 @@ void Scene::CreateDefaultScene() {
     triangles.push_back(new Triangle(v11, v5, v6, diffuse_green_material));
 
     // Spheres
-    spheres.push_back(new Sphere(vec3(5,-4,-2), 2.5, specular_red_material));
-    spheres.push_back(new Sphere(vec3(10,2,-2), 2.5, specular_green_material));
+    spheres.push_back(new Sphere(vec3(5,-4,-2), 2, specular_white_material));
+    spheres.push_back(new Sphere(vec3(10,1.5,-2), 2.5, specular_white_material));
 }
 
 Scene::~Scene() {}
@@ -120,9 +119,8 @@ bool Scene::RayIntersection(vec3 start_point, vec3 direction, vec3 &collision_po
         }
     }
 
-    if (collision) return true;
+    return collision;
 
-    return false;
 }
 
 bool Scene::RayIntersection(vec3 start_point, vec3 direction, vec3 &collision_pos) {
@@ -147,9 +145,8 @@ bool Scene::RayIntersection(vec3 start_point, vec3 direction, vec3 &collision_po
         }
     }
 
-    if (collision) return true;
+    return collision;
 
-    return false;
 }
 
 void Scene::PrepareForRender() {
