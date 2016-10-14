@@ -12,7 +12,8 @@ class DiffuseMaterial : public BaseMaterial {
 public:
     DiffuseMaterial(ColorDbl _color) : BaseMaterial(_color) { };
 
-    virtual void BRDF(Ray* ray, vec3 collision_normal);
+    void BRDF(vec3 ray_direction, vec3 collision_normal, vec3 &reflected_dir, vec3 &transmitted_dir, float &radiance_dist);
+    int get_material_type() { return BaseMaterial::DIFFUSE; }
 };
 
 

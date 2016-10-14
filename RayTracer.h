@@ -22,10 +22,11 @@ public:
 private:
     Scene* scene;
     Ray* ray_tree;
+
     PhotonOctree* photon_map;
 
     ColorDbl TraceShadowRays(Ray* ray, vec3 collision_point);
-    ColorDbl MeanFromPhotonMap(vec3 position);
+    ColorDbl MeanFromPhotonMap(vec3 position, vec3 object_normal);
 };
 
 #endif //TNCG15_PROJ_RAYTRACER_H

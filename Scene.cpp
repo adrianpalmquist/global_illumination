@@ -35,7 +35,7 @@ void Scene::CreateDefaultScene() {
     BaseMaterial* diffuse_blue_material = new DiffuseMaterial(ColorDbl(0,0,1));
     BaseMaterial* diffuse_yellow_material = new DiffuseMaterial(ColorDbl(1,1,0));
     BaseMaterial* diffuse_white_material = new DiffuseMaterial(ColorDbl(1,1,1));
-    BaseMaterial* specular_white_material = new SpecularMaterial(ColorDbl(1,0,0));
+    BaseMaterial* specular_white_material = new SpecularMaterial(ColorDbl(0,0,0));
     specular_white_material->set_transparent();
 
     // Light source

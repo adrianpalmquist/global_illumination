@@ -16,6 +16,8 @@ public:
     static const int TRANSMITTING = 2;
     static const int EMITTING = 3;
 
+    int type;
+
     BaseMaterial();
     explicit BaseMaterial(ColorDbl _color);
 
@@ -34,7 +36,9 @@ public:
     const bool is_transparent();
     void set_transparent();
 
-    virtual void BRDF(Ray* ray, vec3 collision_normal)=0;
+    virtual void BRDF(vec3 ray_direction, vec3 collision_normal, vec3 &reflected_dir, vec3 &transmitted_dir, float &radiance_dist) = 0;
+
+    virtual int get_material_type() = 0;
 private:
     ColorDbl color;
     float opacity;

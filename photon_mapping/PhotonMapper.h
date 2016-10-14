@@ -20,12 +20,16 @@ public:
 
     void Start();
 
-    std::vector<Photon*> photons_temp;
-    PhotonOctree* get_photon_tree();
+    std::vector<Photon*> temporary_photons;
+
+    PhotonOctree* get_photon_map();
 private:
     Scene* scene;
-    PhotonOctree* photon_tree;
+
+    PhotonOctree* photon_map;
+
     std::vector<Triangle*> emitting_triangles;
+    int emitted_photons = 0;
 
     // Used when distributing photons from plane emitters
     void EmitPhoton(vec3 emission_pos, vec3 emission_direction, ColorDbl emission_radiance);

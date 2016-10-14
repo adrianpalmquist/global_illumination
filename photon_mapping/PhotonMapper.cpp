@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <random>
 #include "../Renderer.h"
 
 PhotonMapper::PhotonMapper() {}
@@ -33,57 +34,69 @@ void PhotonMapper::EmitPhoton(vec3 emission_pos, vec3 emission_direction, ColorD
     vec3 collision_pos, collision_normal;
     BaseMaterial* collision_material;
     if (scene->RayIntersection(emission_pos, emission_direction, collision_pos, collision_normal, collision_material)) {
-        // Calculate irradiance from emitted radiance and dropoff
-        float distance_to_emission = length(emission_pos - collision_pos);
-        ColorDbl irradiance = (collision_material->get_color() * emission_radiance * 1.0f / pow(distance_to_emission, 2.0f));
+        if (collision_material->get_material_type() != BaseMaterial::SPECULAR) {
+            // Calculate irradiance from emitted radiance and dropoff
+            float distance_to_emission = length(emission_pos - collision_pos);
+            ColorDbl irradiance = (collision_material->get_color() * emission_radiance * 1.0f / pow(distance_to_emission, 2.0f));
+            if (distance_to_emission < 0.2)
+                irradiance = ColorDbl(0,0,0);
 
-        // Add photon to array
-        photons_temp.push_back(new Photon(irradiance, collision_pos, emission_direction));
+            // Add photon to temporary photon map
+            temporary_photons.push_back(new Photon(irradiance, collision_pos, emission_direction));
 
-        // Check material BRDF if we get reflected/transmitted rays
-        //collision_material->BRDF
+            emitted_photons++;
+
+            // Check material BRDF if we get reflected/transmitted rays
+            vec3 reflected_dir, transmitted_dir;
+            float radiance_distribution = 1.0;
+            collision_material->BRDF(emission_direction, collision_normal, reflected_dir, transmitted_dir, radiance_distribution);
+
+            if (length(reflected_dir) != 0) {
+                ColorDbl reflected_radiance = irradiance; // * radiance_distribution;
+                EmitPhoton(collision_pos, reflected_dir, reflected_radiance);
+            }
+
+            if (length(transmitted_dir) != 0) {
+                ColorDbl transmitted_radiance = irradiance; // * (1 - radiance_distribution);
+                //EmitPhoton(collision_pos, transmitted_dir, transmitted_radiance, false);
+            }
+        }
     }
 }
 
 void PhotonMapper::Start() {
-    std::vector<Photon*> photons;
     emitting_triangles = scene->get_light_emitting_triangles();
 
-    // Calculate how many photons each emitter will emit
-    int photons_per_emitter = (int) (Renderer::NUM_PHOTONS / (emitting_triangles.size() + 1));
-    for (std::vector<Triangle*>::iterator it = emitting_triangles.begin(); it != emitting_triangles.end(); ++it) {
-        Triangle *triangle = *it;
+    std::random_device rd;     // only used once to initialise (seed) engine
+    std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
+    std::uniform_int_distribution<int> uni(0, (int) emitting_triangles.size() - 1); // guaranteed unbiased
+
+    while (emitted_photons < Renderer::NUM_PHOTONS) {
+        // Randomize triangle to emit from
+        int triangle_index = uni(rng);
+        Triangle* triangle = emitting_triangles.at(triangle_index);
         ColorDbl emitted_radiance = triangle->get_material()->get_color() * triangle->get_material()->get_flux();
 
-        int emitted_photons = 0;
-        while (emitted_photons < photons_per_emitter) {
-            // Calculate emission position and direction from emission triangle
-            vec3 emission_pos = triangle->RandomizePointOnTriangle();
-            vec3 emission_direction = CosineDistributeDirection(triangle->get_normal());
-            //vec3 emission_direction = normalize(vec3(((float) rand()) / (RAND_MAX) - 0.5f, ((float) rand()) / (RAND_MAX) - 0.5f,((float) rand()) / (RAND_MAX) - 0.5f));
+        // Calculate emission position and direction from emission triangle
+        vec3 emission_pos = triangle->RandomizePointOnTriangle();
+        vec3 emission_direction = CosineDistributeDirection(triangle->get_normal());
+        //vec3 emission_direction = normalize(vec3(((float) rand()) / (RAND_MAX) - 0.5f, ((float) rand()) / (RAND_MAX) - 0.5f,((float) rand()) / (RAND_MAX) - 0.5f));
 
-            vec3 collision_pos, collision_normal;
-            BaseMaterial* collision_material;
-
-            if (scene->RayIntersection(emission_pos, emission_direction, collision_pos, collision_normal, collision_material)) {
-                // Calculate irradiance from emitted radiance and dropoff
-                float distance_to_light = length(emission_pos - collision_pos);
-                ColorDbl irradiance = (collision_material->get_color() * emitted_radiance * 1.0f / pow(distance_to_light, 2.0f));
-                Photon* photon = new Photon(irradiance, collision_pos, emission_direction);
-
-                photons.push_back(photon);
-                emitted_photons++;
-            }
-        }
+        EmitPhoton(emission_pos, emission_direction, emitted_radiance);
     }
 
+
     BoundingBox region(vec3(-3.5, -6.5, -5.5), vec3(13, 6.5, 5.5));
-    photon_tree = new PhotonOctree(region, photons);
-    photon_tree->BuildTree();
+
+    // Build map for photons
+    photon_map = new PhotonOctree(region, temporary_photons);
+    photon_map->BuildTree();
+
+    std::cout << "Photon mapping finished, photons emitted: " << emitted_photons << std::endl;
 }
 
-PhotonOctree *PhotonMapper::get_photon_tree() {
-    return photon_tree;
+PhotonOctree *PhotonMapper::get_photon_map() {
+    return photon_map;
 }
 
 

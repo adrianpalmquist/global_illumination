@@ -14,6 +14,7 @@ public:
 
     vec3 get_position() { return position; }
     ColorDbl get_radiance() { return radiance; }
+    vec3 get_direction() { return direction; }
 
     const bool operator==(Photon& photon);
 private:

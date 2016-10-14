@@ -18,9 +18,7 @@ void Renderer::Render() {
 
     // Pass 1: Photon mapping
     photon_mapper.Start();
-
-    ray_tracer.set_photon_map(photon_mapper.get_photon_tree());
-    std::cout << "Photon mapping finished" << std::endl;
+    ray_tracer.set_photon_map(photon_mapper.get_photon_map());
 
     std::vector<vec3> sampled_directions;
     vec3 direction;
@@ -33,6 +31,7 @@ void Renderer::Render() {
         for (int y = 0; y < Camera::CAMERA_HEIGHT; y++) {
             for (int x = 0; x < Camera::CAMERA_WIDTH; x++) {
                 ColorDbl pixel_color = ColorDbl(0.0, 0.0, 0.0);
+
                 // Use sampled directions for anti aliasing
                 sampled_directions = camera.get_camera_direction(x, y);
                 for (std::vector<vec3>::iterator it = sampled_directions.begin(); it != sampled_directions.end(); ++it) {
@@ -41,9 +40,10 @@ void Renderer::Render() {
                     pixel_color += ray_tracer.TraceRay(parent_ray) / ((float) ANTI_ALIASING_SAMPLES);
                     delete parent_ray;
                 }
+
                 //progessIndicator(((double)(x+y*Camera::CAMERA_HEIGHT))/( (double)(Camera::CAMERA_HEIGHT * Camera::CAMERA_WIDTH)));
                 //pixel_color = pixel_color / ((float) PATH_TRACING_MAX_SAMPLES);
-                camera.set_pixel_clr(x, y,  pixel_color + camera.get_pixel_clr(x,y));
+                camera.set_raw_pixel_clr(x, y, pixel_color + camera.get_raw_pixel_clr(x, y));
             }
         }
 
@@ -79,17 +79,17 @@ Ray* Renderer::Traverse(Ray* ray) {
 }
 
 void Renderer::CreateImage(int pathtracing_iteration) {
-    double max = 0.0;
-//    double temp;
+    double max_magnitude = 1.0;
+//    double current_max;
 //    for (int x = 0; x < Camera::CAMERA_WIDTH; x++) {
 //        for (int y = 0; y < Camera::CAMERA_HEIGHT; y++) {
-//            camera.set_pixel_clr(x,y, camera.get_pixel_clr(x,y) / ((double) pathtracing_iteration));
-//            temp = camera.get_pixel_clr(x,y).get_clr_magnitude();
-//            if (temp > max) {
-//                max = temp;
+//            current_max = camera.get_raw_pixel_clr(x,y).get_clr_magnitude();
+//            if (current_max > max_magnitude) {
+//                max_magnitude = current_max;
 //            }
 //        }
 //    }
+//    max_magnitude /= ((double) pathtracing_iteration);
 
     FILE *fp = fopen("render2.ppm", "wb"); /* b - binary mode */
     (void) fprintf(fp, "P6\n%d %d\n255\n", Camera::CAMERA_WIDTH, Camera::CAMERA_HEIGHT);
@@ -97,16 +97,16 @@ void Renderer::CreateImage(int pathtracing_iteration) {
     double temp_r, temp_g, temp_b;
     for (int y = 0; y < Camera::CAMERA_WIDTH; y++) {
         for (int x = 0; x < Camera::CAMERA_HEIGHT; x++) {
-            ColorDbl pixel_color = camera.get_pixel_clr(x,y) / ((double) pathtracing_iteration);
+            ColorDbl pixel_color = camera.get_raw_pixel_clr(x, y) / ((double) pathtracing_iteration * max_magnitude);
 
-            temp_r = sqrt(clamp(pixel_color.get_rgb().r, 0.0, 1.0));
-            temp_g = sqrt(clamp(pixel_color.get_rgb().g, 0.0, 1.0));
-            temp_b = sqrt(clamp(pixel_color.get_rgb().b, 0.0, 1.0));
-            max = sqrt(1.0); // in case max != 1
+            temp_r = pow(clamp(pixel_color.get_rgb().r, 0.0, 1.0), 0.6);
+            temp_g = pow(clamp(pixel_color.get_rgb().g, 0.0, 1.0), 0.6);
+            temp_b = pow(clamp(pixel_color.get_rgb().b, 0.0, 1.0), 0.6);
+            //max_magnitude = sqrt(1.0); // in case max != 1
 
-            color[0] = (unsigned char) (temp_r * (255.99 / max));
-            color[1] = (unsigned char) (temp_g * (255.99 / max));
-            color[2] = (unsigned char) (temp_b * (255.99 / max));
+            color[0] = (unsigned char) (temp_r * 255.99);
+            color[1] = (unsigned char) (temp_g * 255.99);
+            color[2] = (unsigned char) (temp_b * 255.99);
 
             (void) fwrite(color, 1, 3, fp);
         }

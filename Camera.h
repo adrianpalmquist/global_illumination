@@ -16,8 +16,8 @@ public:
     Camera();
     vec3 get_camera_position();
     std::vector<vec3> get_camera_direction(int x, int y);
-    void set_pixel_clr(int x, int y, ColorDbl clr);
-    ColorDbl get_pixel_clr(int x, int y);
+    void set_raw_pixel_clr(int x, int y, ColorDbl clr);
+    ColorDbl get_raw_pixel_clr(int x, int y);
 
 private:
     vec3 camera_position;
@@ -26,6 +26,7 @@ private:
     bool selected_eye;
 
     //Camera plane size is 2x2
+    Pixel** raw_camera_plane;
     Pixel** camera_plane;
 
     // Camera plane corner vertices

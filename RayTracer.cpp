@@ -18,18 +18,22 @@ void RayTracer::StartRayTracing(Ray *base_ray) {
 }
 
 // Returns the mean radiance from surrounding photons
-ColorDbl RayTracer::MeanFromPhotonMap(vec3 position) {
-    ColorDbl mean_radiance(0,0,0);
+ColorDbl RayTracer::MeanFromPhotonMap(vec3 position, vec3 object_normal) {
+    ColorDbl radiance(0,0,0);
     std::vector<Photon*> photons = photon_map->GetIntersections(position);
 
+    int photon_count = 0;
     for (int i = 0; i < photons.size(); i++) {
-        mean_radiance += photons.at(i)->get_radiance();
+        if (dot(-photons.at(i)->get_direction(), object_normal) > 0) {
+            radiance += photons.at(i)->get_radiance();
+            photon_count++;
+        }
     }
 
-    if (length(mean_radiance.get_rgb()) != 0)
-        mean_radiance = mean_radiance / ((float) photons.size());
+    double photon_radius = Renderer::PHOTON_RADIUS;
+    radiance = radiance * (1.0 / M_PI) * photon_radius;
 
-    return mean_radiance;
+    return radiance;
 }
 
 
@@ -92,42 +96,58 @@ ColorDbl RayTracer::TraceRay(Ray *ray) {
         if (ray->get_ray_iterations() > 5 || collision_material == nullptr) return ColorDbl(0,0,0);
 
         if (collision_material->is_emitting_light()) {
-            return collision_material->get_light_color() * collision_material->get_flux();
+            //return collision_material->get_light_color() * collision_material->get_flux();
+            return ColorDbl(0,0,0);
         }
-        else {
-            return MeanFromPhotonMap(collision_pos);
-        }
-
-
+        //else { // if (ray->get_ray_iterations() > 0){
+        //    return MeanFromPhotonMap(collision_pos, collision_normal);// + collision_material->get_color() * 0.00;
+        //}
 
         // Create child rays
-        collision_material->BRDF(ray, collision_normal);
+        vec3 reflected_dir, transmitted_dir = vec3(0.0);
+        float radiance_distribution = 0.0;
+        collision_material->BRDF(ray->get_direction(), collision_normal, reflected_dir, transmitted_dir, radiance_distribution);
 
-
-
-        if (!collision_material->is_emitting_light() && !collision_material->is_transparent()) {
-            total_radiance = collision_material->get_color() * TraceShadowRays(ray, collision_pos);
+        if (length(reflected_dir) != 0) {
+            Ray* reflected_ray = new Ray(ray, ray->get_end_point(), reflected_dir, 1 + ray->get_ray_iterations());
+            reflected_ray->set_radiance_distribution(radiance_distribution);
+            ray->set_reflected_ray(reflected_ray);
+            ray->set_transmitted_ray(nullptr);
         }
-        else {
-            total_radiance = collision_material->get_light_color() * collision_material->get_flux();
+
+        if (length(transmitted_dir) != 0) {
+            Ray *transmitted_ray = new Ray(ray, ray->get_end_point(), transmitted_dir, 1 + ray->get_ray_iterations());
+            transmitted_ray->set_radiance_distribution(1 - radiance_distribution);
+            ray->set_transmitted_ray(transmitted_ray);
+            ray->get_reflected_ray()->set_radiance_distribution(radiance_distribution);
         }
+
+        ColorDbl direct_radiance = collision_material->get_color() * TraceShadowRays(ray, collision_pos);
+        total_radiance = direct_radiance;
 
         // Trace child rays
         if (ray->get_reflected_ray() != nullptr) {
             ColorDbl reflected_radiance = TraceRay(ray->get_reflected_ray());
-            total_radiance += reflected_radiance * ray->get_reflected_ray()->get_radiance_distribution();
+            total_radiance += direct_radiance * reflected_radiance * ray->get_reflected_ray()->get_radiance_distribution();
+//            if (ray->get_reflected_ray()->get_end_point() != nullptr) {
+////                double distance = (double) length(*ray->get_reflected_ray()->get_end_point() - collision_pos);
+////                if (distance < 1.0) distance = 1.0;
+////                double dropoff = 1.0 / distance;
+////                if (dropoff < 0) dropoff = 0.0;
+//
+//            }
         }
 
         if (ray->get_transmitted_ray() != nullptr) {
             ColorDbl transmitted_radiance = TraceRay(ray->get_transmitted_ray());
-            total_radiance += transmitted_radiance * ray->get_transmitted_ray()->get_radiance_distribution();
+            total_radiance = total_radiance * transmitted_radiance * ray->get_transmitted_ray()->get_radiance_distribution();
         }
     }
 
     return total_radiance;
 }
 
-void RayTracer::set_photon_map(PhotonOctree *_photon_map) {
+void RayTracer::set_photon_map(PhotonOctree* _photon_map) {
     photon_map = _photon_map;
 }
 

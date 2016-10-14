@@ -16,11 +16,11 @@ public:
     static const bool ANTI_ALIASING = false;
     static const int ANTI_ALIASING_SAMPLES = 4;
     static const int NUM_SHADOW_RAYS = 5;
-    static const int PATHTRACING_SAMPLES = 1;
+    static const int PATHTRACING_SAMPLES = 1000;
 
     // Photon mapping settings
-    static const int NUM_PHOTONS = 100000;
-    static constexpr float PHOTON_RADIUS = 0.2f;
+    static const int NUM_PHOTONS = 0;
+    static constexpr float PHOTON_RADIUS = 0.5f;
 
     int progress_indicator = -1;
 
