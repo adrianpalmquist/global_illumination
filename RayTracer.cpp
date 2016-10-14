@@ -96,8 +96,7 @@ ColorDbl RayTracer::TraceRay(Ray *ray) {
         if (ray->get_ray_iterations() > 5 || collision_material == nullptr) return ColorDbl(0,0,0);
 
         if (collision_material->is_emitting_light()) {
-            //return collision_material->get_light_color() * collision_material->get_flux();
-            return ColorDbl(0,0,0);
+            return collision_material->get_light_color() * collision_material->get_flux();
         }
         //else { // if (ray->get_ray_iterations() > 0){
         //    return MeanFromPhotonMap(collision_pos, collision_normal);// + collision_material->get_color() * 0.00;
@@ -122,29 +121,23 @@ ColorDbl RayTracer::TraceRay(Ray *ray) {
             ray->get_reflected_ray()->set_radiance_distribution(radiance_distribution);
         }
 
-        ColorDbl direct_radiance = collision_material->get_color() * TraceShadowRays(ray, collision_pos);
-        total_radiance = direct_radiance;
+        total_radiance = TraceShadowRays(ray, collision_pos);
 
         // Trace child rays
         if (ray->get_reflected_ray() != nullptr) {
             ColorDbl reflected_radiance = TraceRay(ray->get_reflected_ray());
-            total_radiance += direct_radiance * reflected_radiance * ray->get_reflected_ray()->get_radiance_distribution();
-//            if (ray->get_reflected_ray()->get_end_point() != nullptr) {
-////                double distance = (double) length(*ray->get_reflected_ray()->get_end_point() - collision_pos);
-////                if (distance < 1.0) distance = 1.0;
-////                double dropoff = 1.0 / distance;
-////                if (dropoff < 0) dropoff = 0.0;
-//
-//            }
+            total_radiance += reflected_radiance * ray->get_reflected_ray()->get_radiance_distribution();
         }
 
         if (ray->get_transmitted_ray() != nullptr) {
             ColorDbl transmitted_radiance = TraceRay(ray->get_transmitted_ray());
-            total_radiance = total_radiance * transmitted_radiance * ray->get_transmitted_ray()->get_radiance_distribution();
+            total_radiance += transmitted_radiance * ray->get_transmitted_ray()->get_radiance_distribution();
         }
+
+        return collision_material->get_color() * total_radiance;
     }
 
-    return total_radiance;
+    return ColorDbl(0,0,0);
 }
 
 void RayTracer::set_photon_map(PhotonOctree* _photon_map) {
