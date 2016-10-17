@@ -99,9 +99,9 @@ void Renderer::CreateImage(int pathtracing_iteration) {
         for (int x = 0; x < Camera::CAMERA_HEIGHT; x++) {
             ColorDbl pixel_color = camera.get_raw_pixel_clr(x, y) / ((double) pathtracing_iteration * max_magnitude);
 
-            temp_r = pow(clamp(pixel_color.get_rgb().r, 0.0, 1.0), 0.6);
-            temp_g = pow(clamp(pixel_color.get_rgb().g, 0.0, 1.0), 0.6);
-            temp_b = pow(clamp(pixel_color.get_rgb().b, 0.0, 1.0), 0.6);
+            temp_r = pow(clamp(pixel_color.get_rgb().r, 0.0, 1.0), 0.5);
+            temp_g = pow(clamp(pixel_color.get_rgb().g, 0.0, 1.0), 0.5);
+            temp_b = pow(clamp(pixel_color.get_rgb().b, 0.0, 1.0), 0.5);
             //max_magnitude = sqrt(1.0); // in case max != 1
 
             color[0] = (unsigned char) (temp_r * 255.99);

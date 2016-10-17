@@ -49,7 +49,7 @@ void PhotonMapper::EmitPhoton(vec3 emission_pos, vec3 emission_direction, ColorD
             // Check material BRDF if we get reflected/transmitted rays
             vec3 reflected_dir, transmitted_dir;
             float radiance_distribution = 1.0;
-            collision_material->BRDF(emission_direction, collision_normal, reflected_dir, transmitted_dir, radiance_distribution);
+            collision_material->PDF(emission_direction, collision_normal, reflected_dir, transmitted_dir, radiance_distribution);
 
             if (length(reflected_dir) != 0) {
                 ColorDbl reflected_radiance = irradiance; // * radiance_distribution;

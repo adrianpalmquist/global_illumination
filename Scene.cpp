@@ -35,14 +35,14 @@ void Scene::CreateDefaultScene() {
     BaseMaterial* diffuse_blue_material = new DiffuseMaterial(ColorDbl(0,0,1));
     BaseMaterial* diffuse_yellow_material = new DiffuseMaterial(ColorDbl(1,1,0));
     BaseMaterial* diffuse_white_material = new DiffuseMaterial(ColorDbl(1,1,1));
-    BaseMaterial* specular_white_material = new SpecularMaterial(ColorDbl(0,0,0));
+    BaseMaterial* specular_white_material = new SpecularMaterial(ColorDbl(1,1,1));
     specular_white_material->set_transparent();
 
     // Light source
     BaseMaterial* light_material = new DiffuseMaterial(ColorDbl(1,1,1));
     light_material->enable_light_emission();
-    light_material->set_light_color(ColorDbl(1,1,0.6));
-    light_material->set_flux(6.0f);
+    light_material->set_light_color(ColorDbl(1,1,1));
+    light_material->set_flux(20.0f);
     vec3 *v13 = new vec3(10,-2,4);
     vec3 *v14 = new vec3(10,2,4);
     vec3 *v15 = new vec3(12,-2,2);

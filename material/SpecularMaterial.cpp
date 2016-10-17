@@ -5,7 +5,11 @@
 #include <iostream>
 #include "SpecularMaterial.h"
 
-void SpecularMaterial::BRDF(vec3 ray_direction, vec3 collision_normal, vec3 &reflected_dir, vec3 &transmitted_dir, float &radiance_dist) {
+ColorDbl SpecularMaterial::BRDF(vec3 incoming_direction, vec3 outgoing_direction, vec3 collision_normal) {
+    return get_color();
+}
+
+void SpecularMaterial::PDF(vec3 ray_direction, vec3 collision_normal, vec3 &reflected_dir, vec3 &transmitted_dir, float &radiance_dist) {
     ReflectRay(ray_direction, collision_normal, reflected_dir);
     TransmitRay(ray_direction, collision_normal, reflected_dir, radiance_dist, transmitted_dir);
 }
