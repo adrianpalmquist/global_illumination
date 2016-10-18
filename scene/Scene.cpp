@@ -89,6 +89,10 @@ void Scene::CreateDefaultScene() {
     Object3d light_object(light_triangles);
     objects.push_back(light_object);
 
+    // Teapot object
+    //Object3d teapot = Object3d::loadObj("models/teapot.obj");
+    //objects.push_back(teapot);
+
     // Spheres
     spheres.push_back(new Sphere(vec3(5,-4,-2), 2.0f, diffuse_white_material));
     spheres.push_back(new Sphere(vec3(10,1.5,-2), 2.5f, diffuse_white_material));
@@ -143,8 +147,8 @@ bool Scene::RayIntersection(Ray ray, vec3 &collision_pos) {
 
         // Check for object bounding box collision
         if (object.BoundingBoxCollision(ray)) {
-            for (std::vector<Triangle*>::iterator it = object.get_triangles().begin(); it != object.get_triangles().end(); ++it) {
-                Triangle *triangle = *it;
+            for (int tri = 0; tri < object.get_triangles().size(); tri++) {
+                Triangle* triangle = object.get_triangles().at(tri);
                 if (triangle->RayIntersection(ray.get_start_point(), ray.get_direction(), collision_pos)) {
                     collision = true;
                     break;

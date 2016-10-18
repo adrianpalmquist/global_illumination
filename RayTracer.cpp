@@ -60,19 +60,16 @@ ColorRGB RayTracer::TraceShadowRays(Ray ray, vec3 collision_point) {
                 vec3 ray_endpoint = triangle->BarycentricToCartesian(u, v);
                 vec3 ray_direction = ray_endpoint - collision_point;
                 vec3 ray_collision_pos;
-                float angle_contribution = dot(triangle->get_normal(), -ray_direction);
 
                 // Check so that ray is not coming in from behind
-                if (angle_contribution > 0) {
-                    Ray ray(collision_point, ray_direction, 0);
-                    if (scene->RayIntersection(ray, ray_collision_pos)) {
-                        float distance_to_light = length(ray_direction);
-                        float distance_to_collision = length(ray_collision_pos - collision_point);
+                Ray ray(collision_point, ray_direction, 0);
+                if (scene->RayIntersection(ray, ray_collision_pos)) {
+                    float distance_to_light = length(ray_direction);
+                    float distance_to_collision = length(ray_collision_pos - collision_point);
 
-                        // Check if ray has collided with object before the emission triangle
-                        if (distance_to_light <= distance_to_collision + 0.01) {
-                            radiance_factor += emitting_material->get_flux() * 1.0f / pow(distance_to_light, 2.0f) * angle_contribution;
-                        }
+                    // Check if ray has collided with object before the emission triangle
+                    if (distance_to_light <= distance_to_collision + 0.01) {
+                        radiance_factor += emitting_material->get_flux() * 1.0f / pow(distance_to_light, 2.0f);
                     }
                 }
 
@@ -120,11 +117,11 @@ ColorRGB RayTracer::TraceRay(Ray ray) {
 
         // Handle diffuse case
         if (material_type == BaseMaterial::DIFFUSE) {
-            //ColorRGB incoming_light_radiance = TraceShadowRays(ray, collision_pos);
-            //light_radiance = incoming_light_radiance * collision_material->BRDF(ray.get_direction(), vec3(0), collision_normal);
+            ColorRGB incoming_light_radiance = TraceShadowRays(ray, collision_pos);
+            light_radiance = incoming_light_radiance * collision_material->BRDF(ray.get_direction(), vec3(0), collision_normal);
 
             if (ray_reflected) {
-                reflectance_radiance = TraceRay(reflected_ray) * collision_material->BRDF(ray.get_direction(), vec3(0), collision_normal);
+                //reflectance_radiance = TraceRay(reflected_ray) * collision_material->BRDF(ray.get_direction(), vec3(0), collision_normal);
             }
 
             return light_radiance + reflectance_radiance;

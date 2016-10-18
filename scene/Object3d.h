@@ -16,6 +16,7 @@ public:
     Object3d(std::vector<Triangle*> _triangles);
 
     bool BoundingBoxCollision(Ray ray);
+    void Translate(vec3 translation);
 
     void set_triangles(std::vector<Triangle*> _triangles);
     std::vector<Triangle*> get_triangles();

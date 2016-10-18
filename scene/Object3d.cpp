@@ -3,7 +3,10 @@
 //
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include "Object3d.h"
+#include "../material/DiffuseMaterial.h"
 
 Object3d::Object3d() {}
 
@@ -61,10 +64,49 @@ void Object3d::CalculateBoundingBox() {
 }
 
 Object3d Object3d::loadObj(std::string _filename) {
-    return Object3d();
+    BaseMaterial* mat = new DiffuseMaterial(ColorRGB(1,1,1));
+
+    std::vector<vec3*> vertices;
+    std::vector<Triangle*> triangles;
+
+    std::string line;
+    std::ifstream obj_file(_filename);
+    if (obj_file.is_open())
+    {
+        while (getline(obj_file, line))
+        {
+            std::istringstream iss(line);
+            std::string type;
+            iss >> type;
+
+            if (type == "f") {
+                std::string string_v0;
+                std::string string_v1;
+                std::string string_v2;
+                iss >> string_v0 >> string_v1 >> string_v2;
+
+                Triangle* tri = new Triangle(vertices.at(std::stoi(string_v0)-1), vertices.at(std::stoi(string_v0)-1), vertices.at(std::stoi(string_v0)-1), mat);
+                triangles.push_back(tri);
+            }
+            else if (type == "v") {
+                std::string string_x;
+                std::string string_y;
+                std::string string_z;
+                iss >> string_x >> string_y >> string_z;
+
+                vertices.push_back(new vec3(std::stof(string_x) + 4, std::stof(string_y), std::stof(string_z)));
+            }
+        }
+        obj_file.close();
+    }
+
+    return Object3d(triangles);
 }
 
 bool Object3d::BoundingBoxCollision(Ray ray) {
     return bounding_box.RayIntersection(ray);
+}
+
+void Object3d::Translate(vec3 translation) {
 }
 
