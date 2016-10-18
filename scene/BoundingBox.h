@@ -7,6 +7,7 @@
 
 
 #include "../glm/vec3.hpp"
+#include "../Ray.h"
 
 using namespace glm;
 
@@ -17,6 +18,7 @@ public:
 
     bool Contains(vec3 p);
     bool ConainsPoint(vec3 p);
+    bool RayIntersection(Ray ray);
 
     const vec3 get_min();
     const vec3 get_max();

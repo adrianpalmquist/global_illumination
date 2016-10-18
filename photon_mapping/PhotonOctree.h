@@ -8,7 +8,7 @@
 
 #include <vector>
 #include <queue>
-#include "BoundingBox.h"
+#include "../scene/BoundingBox.h"
 #include "Photon.h"
 
 class PhotonOctree {

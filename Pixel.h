@@ -7,17 +7,17 @@
 
 
 #include "Ray.h"
-#include "ColorDbl.h"
+#include "ColorRGB.h"
 
 class Pixel {
 public:
     Pixel();
     ~Pixel();
     Ray * get_base_ray() const;
-    ColorDbl get_clr() const;
-    void set_clr(ColorDbl vec);
+    ColorRGB get_clr() const;
+    void set_clr(ColorRGB vec);
 private:
-    ColorDbl clr;
+    ColorRGB clr;
     Ray * base_ray;
 };
 

@@ -5,30 +5,30 @@
 #include "BaseMaterial.h"
 
 BaseMaterial::BaseMaterial() {
-    color = ColorDbl(0.0, 0.0, 0.0);
+    color = ColorRGB(0.0, 0.0, 0.0);
     specularity = 0.0f;
     opacity = 0.0f;
     light_emission_enabled = false;
     flux = 0.0f;
-    light_color = ColorDbl(0.0, 0.0, 0.0);
+    light_color = ColorRGB(0.0, 0.0, 0.0);
     transparent = false;
 }
 
-BaseMaterial::BaseMaterial(ColorDbl _color) {
+BaseMaterial::BaseMaterial(ColorRGB _color) {
     color = _color;
     specularity = 0.0f;
     opacity = 0.0f;
     light_emission_enabled = false;
     flux = 0.0f;
-    light_color = ColorDbl(0.0, 0.0, 0.0);
+    light_color = ColorRGB(0.0, 0.0, 0.0);
     transparent = false;
 }
 
-const ColorDbl BaseMaterial::get_color() const {
+const ColorRGB BaseMaterial::get_color() const {
     return color;
 }
 
-void BaseMaterial::set_color(ColorDbl _color) {
+void BaseMaterial::set_color(ColorRGB _color) {
     color = _color;
 }
 
@@ -40,7 +40,7 @@ void BaseMaterial::enable_light_emission() {
     light_emission_enabled = true;
 }
 
-void BaseMaterial::set_light_color(ColorDbl _light_color) {
+void BaseMaterial::set_light_color(ColorRGB _light_color) {
     light_color = _light_color;
 }
 
@@ -52,7 +52,7 @@ float BaseMaterial::get_flux() {
     return flux;
 }
 
-ColorDbl BaseMaterial::get_light_color() {
+ColorRGB BaseMaterial::get_light_color() {
     return light_color;
 }
 

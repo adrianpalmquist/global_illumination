@@ -1,79 +1,84 @@
 #include <iostream>
 #include <time.h>
 #include "Renderer.h"
+#include "material/DiffuseMaterial.h"
 
-vec3 reflect(vec3 normal) {
-    double azimuth = 2 * 3.14 * ((double) rand() / RAND_MAX); //phi
-    double inclination = acos(sqrt((double) rand() / RAND_MAX)); //theta
+void TransmitRay(vec3 direction, vec3 collision_normal, vec3 reflected_direction, float &radiance_dist, bool incoming_ray, vec3 &transmitted_direction) {
+    float n1, n2;
+    if (!(collision_normal.x == 0 && collision_normal.y == 0 && collision_normal.z == 0)) {
+        vec3 real_normal = !incoming_ray ? collision_normal : -collision_normal;
 
-    vec3 reflected_dir = normalize(vec3(sin(inclination) * cos(azimuth), sin(inclination) * sin(azimuth), cos(inclination)));
-    vec3 tangent_1 = cross(normal, vec3(0,0,1));
-    vec3 tangent_2 = cross(normal, tangent_1);
-
-    mat3 rotationMatrix = mat3(tangent_1, tangent_2, normal);
-    reflected_dir = transpose(rotationMatrix)*reflected_dir;
-
-    return normalize(reflected_dir);
-}
-
-vec3 CosineDistributeDirection(vec3 normal) {
-    float sin_theta = (((float) rand()) / RAND_MAX);
-    float cos_theta = (float) (1.0 - sin_theta * sin_theta);
-
-    // Random in plane angle;
-    float psi = (float) (((float) rand()) / RAND_MAX * 2.0f * M_PI);
-
-    // Generate tangents along plane
-    vec3 tangent1, tangent2;
-    tangent1 = cross(normal, vec3(0,0,1));
-    tangent2 = cross(normal, tangent1);
-
-    vec3 v1, v2, v3;
-    v1 = sin_theta * cos(psi) * tangent1;
-    v2 = sin_theta * sin(psi) * tangent2;
-    v3 = cos_theta * normal;
-
-    return v1 + v2 + v3;
-}
-
-vec3 rotateVec(vec3 normal) {
-    int abortCounter = 0;
-    while(true)
-    {
-        vec3 b((((float) rand()) / RAND_MAX) - 0.5f, (((float) rand()) / RAND_MAX) - 0.5f, (((float) rand()) / RAND_MAX) - 0.5f);
-        b = normalize(b);
-
-        if (dot(b, normal) > 0)
-        {
-            return b;
+        if (incoming_ray) {
+            n1 = 1.0f;
+            n2 = 1.5f;
+        }
+        else {
+            n1 = 1.5f;
+            n2 = 1.0f;
         }
 
-        abortCounter++;
-        if (abortCounter > 500)
-        {
-            return b; // for some reason (NaN's perhaps) we don't found a normal
+        float cosI = dot(direction, real_normal);
+        float n = n1 / n2;
+        float sinT2 = n*n * (1.0f - cosI * cosI);
+        float cosT = sqrtf(1.0 - sinT2);
+
+        // Fresnel equations
+        float rn = (n1 * cosI - n2 * cosT) / (n1 * cosI + n2 * cosT);
+        float rt = (n2 * cosI - n1 * cosT) / (n2 * cosI + n2 * cosT);
+        rn *= rn;
+        rt *= rt;
+        float refl = (rn + rt) * 0.5f;
+        float trans = 1.0f - refl;
+
+        if (n == 1.0) {
+            transmitted_direction = direction;
+            return;
         }
+
+
+        if(cosT * cosT < 0.0)//tot inner refl
+        {
+            refl = 1;
+            trans = 0;
+            transmitted_direction = direction;
+            return;
+        }
+
+        transmitted_direction =  (n * cosI - cosT) * real_normal;
     }
 }
+
 
 int main() {
     srand (time(NULL));
 
     const clock_t begin_time = clock();
 
-//    vec3 test(1, 0, 1);
-//    vec3 mean_direction = vec3(0,0,0);
-//    float iterations = 1000000.0f;
-//    for (int i = 0; i < iterations; i++) {
-//        //vec3 reflection = reflect(test);
-//        vec3 reflection = rotateVec(test);
-//        mean_direction += reflection;
-//        //std::cout << reflection.x << " " << reflection.y << " " << reflection.z << std::endl;
-//    }
-//    mean_direction /= iterations;
+//    Sphere test(vec3(0,0,0), 1, new DiffuseMaterial(ColorRGB(1,1,1)));
 //
-//    std::cout << "mean mean" << std::endl;
-//    std::cout << mean_direction.x << " " << mean_direction.y << " " << mean_direction.z << std::endl;
+//    vec3 collision_pos;
+//    vec3 collision_normal;
+//    vec3 origin = vec3(-2, 0, 0);
+//    vec3 direction = vec3(1, 0, 0);
+//    float radiance_dist = 0.0f;
+//
+//    vec3 transmitted_direction;
+//    test.RayIntersection(origin, direction, collision_pos, collision_normal);
+//    TransmitRay(direction, collision_normal, vec3(0), radiance_dist, true, transmitted_direction);
+//
+//    std::cout << "Collision pos 1: " <<  collision_pos.x << " " << collision_pos.y << " " << collision_pos.z << std::endl;
+//    std::cout << "Collision normal 1: " <<  collision_normal.x << " " << collision_normal.y << " " << collision_normal.z << std::endl;
+//    std::cout << "Transmitted direction 1: " << transmitted_direction.x << " " << transmitted_direction.y << " " << transmitted_direction.z << std::endl;
+//
+//    test.RayIntersection(vec3(collision_pos), direction, collision_pos, collision_normal);
+//    TransmitRay(direction, collision_normal, vec3(0), radiance_dist, false, transmitted_direction);
+//
+//    std::cout << std::endl;
+//    std::cout << "Collision pos 2: " <<  collision_pos.x << " " << collision_pos.y << " " << collision_pos.z << std::endl;
+//    std::cout << "Collision normal 2: " <<  collision_normal.x << " " << collision_normal.y << " " << collision_normal.z << std::endl;
+//    std::cout << "Transmitted direction 2: " << transmitted_direction.x << " " << transmitted_direction.y << " " << transmitted_direction.z << std::endl;
+//    std::cout << std::endl;
+
 
     Renderer r = Renderer();
     r.Render();

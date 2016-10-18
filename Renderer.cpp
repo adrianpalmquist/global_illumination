@@ -30,15 +30,14 @@ void Renderer::Render() {
         // Loop through each pixel in the image
         for (int y = 0; y < Camera::CAMERA_HEIGHT; y++) {
             for (int x = 0; x < Camera::CAMERA_WIDTH; x++) {
-                ColorDbl pixel_color = ColorDbl(0.0, 0.0, 0.0);
+                ColorRGB pixel_color = ColorRGB(0.0, 0.0, 0.0);
 
                 // Use sampled directions for anti aliasing
                 sampled_directions = camera.get_camera_direction(x, y);
                 for (std::vector<vec3>::iterator it = sampled_directions.begin(); it != sampled_directions.end(); ++it) {
                     direction = *it;
-                    Ray *parent_ray = new Ray(nullptr, new vec3(origin), direction, 0);
+                    Ray parent_ray = Ray(vec3(origin), direction, 0);
                     pixel_color += ray_tracer.TraceRay(parent_ray) / ((float) ANTI_ALIASING_SAMPLES);
-                    delete parent_ray;
                 }
 
                 //progessIndicator(((double)(x+y*Camera::CAMERA_HEIGHT))/( (double)(Camera::CAMERA_HEIGHT * Camera::CAMERA_WIDTH)));
@@ -52,12 +51,7 @@ void Renderer::Render() {
     }
 }
 
-ColorDbl Renderer::ColorFromRayTree(Ray *parentRay) {
-    Ray* ray = Traverse(parentRay);
-    return ray->get_ray_color();
-}
-
-double clamp(double input, double min, double max) {
+double clamp(float input, float min, float max) {
     if (input < min)
         return min;
 
@@ -65,17 +59,6 @@ double clamp(double input, double min, double max) {
         return max;
 
     return input;
-}
-
-Ray* Renderer::Traverse(Ray* ray) {
-    if (ray != nullptr){
-        Traverse(ray->get_reflected_ray());
-        Traverse(ray->get_transmitted_ray());
-        if (ray->get_parent_ray() != nullptr) {
-            ray->get_parent_ray()->add_ray_color(ray->get_ray_color() * ray->get_radiance_distribution());
-        }
-    }
-    return ray;
 }
 
 void Renderer::CreateImage(int pathtracing_iteration) {
@@ -97,11 +80,11 @@ void Renderer::CreateImage(int pathtracing_iteration) {
     double temp_r, temp_g, temp_b;
     for (int y = 0; y < Camera::CAMERA_WIDTH; y++) {
         for (int x = 0; x < Camera::CAMERA_HEIGHT; x++) {
-            ColorDbl pixel_color = camera.get_raw_pixel_clr(x, y) / ((double) pathtracing_iteration * max_magnitude);
+            ColorRGB pixel_color = camera.get_raw_pixel_clr(x, y) / ((float) pathtracing_iteration * max_magnitude);
 
-            temp_r = pow(clamp(pixel_color.get_rgb().r, 0.0, 1.0), 0.5);
-            temp_g = pow(clamp(pixel_color.get_rgb().g, 0.0, 1.0), 0.5);
-            temp_b = pow(clamp(pixel_color.get_rgb().b, 0.0, 1.0), 0.5);
+            temp_r = pow(clamp(pixel_color.get_rgb().r, 0.0f, 1.0f), 0.5f);
+            temp_g = pow(clamp(pixel_color.get_rgb().g, 0.0f, 1.0f), 0.5f);
+            temp_b = pow(clamp(pixel_color.get_rgb().b, 0.0f, 1.0f), 0.5f);
             //max_magnitude = sqrt(1.0); // in case max != 1
 
             color[0] = (unsigned char) (temp_r * 255.99);

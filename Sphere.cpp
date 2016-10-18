@@ -12,37 +12,31 @@ float sum(vec3 vec) {
 }
 
 bool Sphere::RayIntersection(vec3 origin, vec3 direction, vec3 &intersection_point, vec3 &normal) {
-    const vec3 displacement = origin - position;
-    const float a = direction.x * direction.x + direction.y * direction.y + direction.z * direction.z;
-    const float b = 2.0f * dot(direction, displacement);
-    const float c = sum(displacement * displacement) - radius*radius;
+    vec3 op = position - origin;
+    float t, epsilon = 0.0001f;
+    float b = dot(op, direction);
+    float disc = b * b - dot(op, op) + radius * radius;
 
-    const float radicand = b * b - 4.0f * a * c;
-    std::vector<vec3> intersections;
-    if (radicand >= 0.0f) {
-        const float root = sqrt(radicand);
-        const float denom = 2.0f * a;
-        const float u[2] = {
-                (-b + root) / denom,
-                (-b - root) / denom
-        };
-
-        for (int i = 0; i < 2; i++) {
-            if (u[i] > 0.0001) {
-                const vec3 originToSurface = u[i] * direction;
-                intersections.push_back(origin + originToSurface);
-            }
-        }
-
-        /// BRASKLAPP
-        if (intersections.size() != 0) {
-            intersection_point = intersections.at(0);
-            normal = normalize(intersection_point - position);
-            return true;
-        }
-
+    if (disc < 0) {
         return false;
+    }
 
+    disc = sqrtf(disc);
+
+    t = b - disc;
+    if (t > epsilon) {
+        intersection_point = origin + direction * t;
+        normal = normalize(intersection_point - position);
+        //normal = dot(normal, direction) < 0 ? normal : -1.0f * normal;
+        return true;
+    }
+
+    t = b + disc;
+    if (t > epsilon) {
+        intersection_point = origin + direction * t;
+        normal = normalize(intersection_point - position);
+        //normal = dot(normal, direction) < 0 ? normal : -1.0f * normal;
+        return true;
     }
 
     return false;

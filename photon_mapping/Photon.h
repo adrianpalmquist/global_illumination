@@ -6,21 +6,21 @@
 #define TNCG15_PROJ_PHOTON_H
 
 
-#include "../ColorDbl.h"
+#include "../ColorRGB.h"
 
 class Photon {
 public:
-    Photon(ColorDbl _radiance, vec3 _position, vec3 _direction): radiance(_radiance), position(_position), direction(_direction) {};
+    Photon(ColorRGB _radiance, vec3 _position, vec3 _direction): radiance(_radiance), position(_position), direction(_direction) {};
 
     vec3 get_position() { return position; }
-    ColorDbl get_radiance() { return radiance; }
+    ColorRGB get_radiance() { return radiance; }
     vec3 get_direction() { return direction; }
 
     const bool operator==(Photon& photon);
 private:
     vec3 position;
     vec3 direction;
-    ColorDbl radiance;
+    ColorRGB radiance;
 };
 
 

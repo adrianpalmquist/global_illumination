@@ -6,8 +6,8 @@
 #define TNCG15_PROJ_TRIANGLE_H
 
 
-#include "ColorDbl.h"
-#include "material/BaseMaterial.h"
+#include "../ColorRGB.h"
+#include "../material/BaseMaterial.h"
 
 class Triangle {
 public:
@@ -21,6 +21,10 @@ public:
     vec3 get_normal();
     vec3 get_reflection(vec3 direction, vec3 normal);
     BaseMaterial* get_material();
+
+    vec3* get_v0() { return v0; }
+    vec3* get_v1() { return v1; }
+    vec3* get_v2() { return v2; }
 
     vec3 RandomizePointOnTriangle();
 private:

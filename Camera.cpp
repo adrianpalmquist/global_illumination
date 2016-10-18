@@ -20,7 +20,7 @@ Camera::Camera() {
 
     for (int y = 0; y < Camera::CAMERA_HEIGHT; y++) {
         for (int x = 0; x < Camera::CAMERA_WIDTH; x++) {
-            set_raw_pixel_clr(x, y, ColorDbl(0, 0, 0));
+            set_raw_pixel_clr(x, y, ColorRGB(0, 0, 0));
         }
     }
 
@@ -85,11 +85,11 @@ std::vector<vec3> Camera::get_camera_direction(int x, int y) {
     }
 }
 
-void Camera::set_raw_pixel_clr(int x, int y, ColorDbl clr) {
+void Camera::set_raw_pixel_clr(int x, int y, ColorRGB clr) {
     raw_camera_plane[x][y].set_clr(clr);
 }
 
-ColorDbl Camera::get_raw_pixel_clr(int x, int y) {
+ColorRGB Camera::get_raw_pixel_clr(int x, int y) {
     return raw_camera_plane[x][y].get_clr();
 }
 

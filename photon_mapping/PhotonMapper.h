@@ -8,7 +8,7 @@
 
 #include "PhotonKdTree.h"
 #include "../glm/glm.hpp"
-#include "../Scene.h"
+#include "../scene/Scene.h"
 #include "PhotonOctree.h"
 
 using namespace glm;
@@ -32,7 +32,7 @@ private:
     int emitted_photons = 0;
 
     // Used when distributing photons from plane emitters
-    void EmitPhoton(vec3 emission_pos, vec3 emission_direction, ColorDbl emission_radiance);
+    void EmitPhoton(vec3 emission_pos, vec3 emission_direction, ColorRGB emission_radiance);
     vec3 CosineDistributeDirection(vec3 normal);
 };
 

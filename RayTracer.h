@@ -5,7 +5,7 @@
 #ifndef TNCG15_PROJ_RAYTRACER_H
 #define TNCG15_PROJ_RAYTRACER_H
 
-#include "Scene.h"
+#include "scene/Scene.h"
 #include "Ray.h"
 #include "photon_mapping/Photon.h"
 #include "photon_mapping/PhotonOctree.h"
@@ -14,8 +14,8 @@ class RayTracer {
 public:
     RayTracer();
     RayTracer(Scene* _scene);
-    void StartRayTracing(Ray* base_ray);
-    ColorDbl TraceRay(Ray* ray);
+    void StartRayTracing(Ray base_ray);
+    ColorRGB TraceRay(Ray ray);
 
     void set_photon_map(PhotonOctree* _photon_map);
 
@@ -25,8 +25,8 @@ private:
 
     PhotonOctree* photon_map;
 
-    ColorDbl TraceShadowRays(Ray* ray, vec3 collision_point);
-    ColorDbl MeanFromPhotonMap(vec3 position, vec3 object_normal);
+    ColorRGB TraceShadowRays(Ray ray, vec3 collision_point);
+    ColorRGB MeanFromPhotonMap(vec3 position, vec3 object_normal);
 };
 
 #endif //TNCG15_PROJ_RAYTRACER_H

@@ -5,7 +5,7 @@
 #ifndef TNCG15_PROJ_CAMERA_H
 #define TNCG15_PROJ_CAMERA_H
 
-#include "ColorDbl.h"
+#include "ColorRGB.h"
 #include "Pixel.h"
 
 class Camera {
@@ -16,8 +16,8 @@ public:
     Camera();
     vec3 get_camera_position();
     std::vector<vec3> get_camera_direction(int x, int y);
-    void set_raw_pixel_clr(int x, int y, ColorDbl clr);
-    ColorDbl get_raw_pixel_clr(int x, int y);
+    void set_raw_pixel_clr(int x, int y, ColorRGB clr);
+    ColorRGB get_raw_pixel_clr(int x, int y);
 
 private:
     vec3 camera_position;

@@ -12,14 +12,13 @@ RayTracer::RayTracer() {}
 
 RayTracer::RayTracer(Scene *_scene): scene(_scene) {}
 
-void RayTracer::StartRayTracing(Ray *base_ray) {
-    ray_tree = base_ray;
+void RayTracer::StartRayTracing(Ray base_ray) {
     TraceRay(base_ray);
 }
 
 // Returns the mean radiance from surrounding photons
-ColorDbl RayTracer::MeanFromPhotonMap(vec3 position, vec3 object_normal) {
-    ColorDbl radiance(0,0,0);
+ColorRGB RayTracer::MeanFromPhotonMap(vec3 position, vec3 object_normal) {
+    ColorRGB radiance(0,0,0);
     std::vector<Photon*> photons = photon_map->GetIntersections(position);
 
     int photon_count = 0;
@@ -30,16 +29,16 @@ ColorDbl RayTracer::MeanFromPhotonMap(vec3 position, vec3 object_normal) {
         }
     }
 
-    double photon_radius = Renderer::PHOTON_RADIUS;
-    radiance = radiance * (1.0 / M_PI) * photon_radius;
+    float photon_radius = Renderer::PHOTON_RADIUS;
+    radiance = radiance * (1.0f / ((float) M_PI)) * photon_radius;
 
     return radiance;
 }
 
 
 // Returns radiance contribution from light sources
-ColorDbl RayTracer::TraceShadowRays(Ray *ray, vec3 collision_point) {
-    ColorDbl radiance_from_light = ColorDbl(0,0,0);
+ColorRGB RayTracer::TraceShadowRays(Ray ray, vec3 collision_point) {
+    ColorRGB radiance_from_light = ColorRGB(0,0,0);
 
     std::vector<Triangle*> light_emitting_triangles = scene->get_light_emitting_triangles();
     for (std::vector<Triangle*>::iterator it = light_emitting_triangles.begin(); it != light_emitting_triangles.end(); ++it) {
@@ -61,14 +60,19 @@ ColorDbl RayTracer::TraceShadowRays(Ray *ray, vec3 collision_point) {
                 vec3 ray_endpoint = triangle->BarycentricToCartesian(u, v);
                 vec3 ray_direction = ray_endpoint - collision_point;
                 vec3 ray_collision_pos;
+                float angle_contribution = dot(triangle->get_normal(), -ray_direction);
 
-                if (scene->RayIntersection(collision_point, ray_direction, ray_collision_pos)) {
-                    float distance_to_light = length(ray_direction);
-                    float distance_to_collision = length(ray_collision_pos - collision_point);
+                // Check so that ray is not coming in from behind
+                if (angle_contribution > 0) {
+                    Ray ray(collision_point, ray_direction, 0);
+                    if (scene->RayIntersection(ray, ray_collision_pos)) {
+                        float distance_to_light = length(ray_direction);
+                        float distance_to_collision = length(ray_collision_pos - collision_point);
 
-                    // Check if ray has collided with object before the emission triangle
-                    if (distance_to_light <= distance_to_collision + 0.01) {
-                        radiance_factor += emitting_material->get_flux() * 1.0f / pow(distance_to_light, 1.8f);
+                        // Check if ray has collided with object before the emission triangle
+                        if (distance_to_light <= distance_to_collision + 0.01) {
+                            radiance_factor += emitting_material->get_flux() * 1.0f / pow(distance_to_light, 2.0f) * angle_contribution;
+                        }
                     }
                 }
 
@@ -78,75 +82,71 @@ ColorDbl RayTracer::TraceShadowRays(Ray *ray, vec3 collision_point) {
 
         // Add to radiance factor
         radiance_factor /= (float) Renderer::NUM_SHADOW_RAYS;
-        radiance_from_light += emitting_material->get_light_color() * radiance_factor;
+        radiance_from_light += emitting_material->get_color() * radiance_factor;
     }
     return radiance_from_light;
 }
 
-ColorDbl RayTracer::TraceRay(Ray *ray) {
-    ColorDbl total_radiance(0,0,0);
+ColorRGB RayTracer::TraceRay(Ray ray) {
     vec3 collision_normal, collision_pos;
     BaseMaterial* collision_material = nullptr;
 
-    if (scene->RayIntersection(*ray->get_start_point(), ray->get_direction(), collision_pos, collision_normal, collision_material)) {
+    if (scene->RayIntersection(ray, collision_pos, collision_normal, collision_material)) {
         // Set ray end point
-        ray->set_end_point(new vec3(collision_pos.x, collision_pos.y, collision_pos.z));
+        ray.set_end_point(vec3(collision_pos.x, collision_pos.y, collision_pos.z));
 
         // Return if ray exceeds max iterations
-        if (ray->get_ray_iterations() > 5 || collision_material == nullptr) return ColorDbl(0,0,0);
-
-        if (collision_material->is_emitting_light()) {
-            return collision_material->get_light_color() * collision_material->get_flux();
-        }
+        if (ray.get_ray_iterations() > 5 || collision_material == nullptr) return ColorRGB(0,0,0);
 
         // Create child rays
         vec3 reflected_dir, transmitted_dir = vec3(0.0);
-        float radiance_distribution = 0.0;
-        collision_material->PDF(ray->get_direction(), collision_normal, reflected_dir, transmitted_dir, radiance_distribution);
+        Ray reflected_ray, transmitted_ray;
+        bool ray_reflected = false;
 
-        if (length(reflected_dir) != 0) {
-            Ray* reflected_ray = new Ray(ray, ray->get_end_point(), reflected_dir, 1 + ray->get_ray_iterations());
-            reflected_ray->set_radiance_distribution(radiance_distribution);
-            ray->set_reflected_ray(reflected_ray);
-            ray->set_transmitted_ray(nullptr);
+        float radiance_distribution = 1.0f;
+        collision_material->PDF(ray.get_direction(), collision_normal, reflected_dir, transmitted_dir, radiance_distribution);
+
+        if (!(reflected_dir.x == 0 && reflected_dir.y == 0 && reflected_dir.z == 0)) {
+            reflected_ray = Ray(ray.get_end_point() + reflected_dir * 0.05f, reflected_dir, 1 + ray.get_ray_iterations());
+            ray_reflected = true;
         }
 
-        if (length(transmitted_dir) != 0) {
-            Ray *transmitted_ray = new Ray(ray, ray->get_end_point(), transmitted_dir, 1 + ray->get_ray_iterations());
-            transmitted_ray->set_radiance_distribution(1 - radiance_distribution);
-            ray->set_transmitted_ray(transmitted_ray);
-            ray->get_reflected_ray()->set_radiance_distribution(radiance_distribution);
+        if (!(transmitted_dir.x == 0 && transmitted_dir.y == 0 && transmitted_dir.z == 0)) {
+            transmitted_ray = Ray(ray.get_end_point() + transmitted_dir * 0.05f, transmitted_dir, 1 + ray.get_ray_iterations());
         }
 
-        ColorDbl light_radiance, reflectance_radiance, transmission_radiance;
-        if (collision_material->get_material_type() == BaseMaterial::DIFFUSE) {
-            light_radiance = TraceShadowRays(ray, collision_pos) * collision_material->BRDF(ray->get_direction(), vec3(0), collision_normal);
+        ColorRGB light_radiance, reflectance_radiance, transmission_radiance;
+        int material_type = collision_material->get_material_type();
 
-            if (ray->get_reflected_ray() != nullptr) {
-                ColorDbl reflected_radiance = TraceRay(ray->get_reflected_ray());
-                reflectance_radiance = reflected_radiance * ray->get_reflected_ray()->get_radiance_distribution() * collision_material->BRDF(ray->get_direction(), vec3(0), collision_normal);
+        // Handle diffuse case
+        if (material_type == BaseMaterial::DIFFUSE) {
+            //ColorRGB incoming_light_radiance = TraceShadowRays(ray, collision_pos);
+            //light_radiance = incoming_light_radiance * collision_material->BRDF(ray.get_direction(), vec3(0), collision_normal);
+
+            if (ray_reflected) {
+                reflectance_radiance = TraceRay(reflected_ray) * collision_material->BRDF(ray.get_direction(), vec3(0), collision_normal);
             }
 
             return light_radiance + reflectance_radiance;
         }
-        else if (collision_material->get_material_type() == BaseMaterial::SPECULAR) {
-            if (ray->get_reflected_ray() != nullptr) {
-                ColorDbl reflected_radiance = TraceRay(ray->get_reflected_ray());
-                reflectance_radiance = reflected_radiance * ray->get_reflected_ray()->get_radiance_distribution() * collision_material->BRDF(ray->get_direction(), vec3(0), collision_normal);
-            }
 
-            if (ray->get_transmitted_ray() != nullptr) {
-                ColorDbl transmitted_radiance = TraceRay(ray->get_transmitted_ray());
-                transmission_radiance = transmitted_radiance * ray->get_transmitted_ray()->get_radiance_distribution();
-            }
-
-            return reflectance_radiance + transmission_radiance;
+        // Handle specular/perfect reflection case
+        if (material_type == BaseMaterial::SPECULAR) {
+            return TraceRay(reflected_ray) * collision_material->BRDF(ray.get_direction(), vec3(0), collision_normal);
         }
 
+        // Handle transmitting cae
+        if (material_type == BaseMaterial::TRANSMITTING) {
+            return TraceRay(transmitted_ray) * (1.0f - radiance_distribution) + TraceRay(reflected_ray) * radiance_distribution;
+        }
 
+        // Handle emitting case
+        if (material_type == BaseMaterial::EMISSION) {
+            return collision_material->BRDF(ray.get_direction(), vec3(0), collision_normal);
+        }
     }
 
-    return ColorDbl(0,0,0);
+    return ColorRGB(0,0,0);
 }
 
 void RayTracer::set_photon_map(PhotonOctree* _photon_map) {
