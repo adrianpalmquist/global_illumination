@@ -29,7 +29,6 @@ public:
 private:
     //PhotonMapper photonMapper;
     std::vector<Object3d> objects;
-    //std::vector<Triangle*> triangles;
     std::vector<Triangle*> light_emitting_triangles; // Calucated before render
     std::vector<Sphere*> spheres;
 

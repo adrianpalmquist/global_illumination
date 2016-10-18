@@ -40,7 +40,7 @@ void TransmissionMaterial::TransmitRay(vec3 direction, vec3 collision_normal, ve
                 -(n1 / n2) * dot(real_normal, direction) -
                 sqrtf(1.0f - powf((n1 / n2), 2.0f) * (1.0f - (powf(dot(real_normal, direction), 2))))));
 
-        float angle = acos(dot(-direction, real_normal));
+        float angle = acosf(dot(-direction, real_normal));
         float r_s = powf((n1 * cosf(angle) - n2 * sqrtf(1.0f - powf((n1 / n2) * sinf(angle), 2.0f))) /
                                  (n1 * cosf(angle) + n2 * sqrtf(1.0f - powf((n1 / n2) * sinf(angle), 2.0f))), 2.0f);
         float r_p = powf((n1 * sqrtf(1.0f - powf((n1 / n2) * sinf(angle), 2)) - n2 * cosf(angle)) /

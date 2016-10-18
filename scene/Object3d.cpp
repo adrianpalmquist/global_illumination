@@ -2,6 +2,7 @@
 // Created by Filip K on 18/10/16.
 //
 
+#include <iostream>
 #include "Object3d.h"
 
 Object3d::Object3d() {}

@@ -40,21 +40,6 @@ void Scene::CreateDefaultScene() {
     BaseMaterial* specular_white_material = new SpecularMaterial(ColorRGB(1,1,1));
     BaseMaterial* transmission_material = new TransmissionMaterial(ColorRGB(1,1,1));
 
-    // Light source
-    BaseMaterial* light_material = new EmissionMaterial(ColorRGB(1,1,1), 1000);
-    vec3 *v13 = new vec3(10,-2,4);
-    vec3 *v14 = new vec3(10,2,4);
-    vec3 *v15 = new vec3(12,-2,2);
-    vec3 *v16 = new vec3(12,2,2);
-
-
-    std::vector<Triangle*> light_triangles;
-    light_triangles.push_back(new Triangle(v13, v14, v15, light_material));
-    light_triangles.push_back(new Triangle(v14, v16, v15, light_material));
-
-    Object3d light_object(light_triangles);
-    objects.push_back(light_object);
-
     // Room object
     std::vector<Triangle*> room_triangles;
 
@@ -89,6 +74,21 @@ void Scene::CreateDefaultScene() {
     Object3d room_object(room_triangles);
     objects.push_back(room_object);
 
+    // Light source
+    BaseMaterial* light_material = new EmissionMaterial(ColorRGB(1,1,1), 1000);
+    vec3 *v13 = new vec3(10,-2,4);
+    vec3 *v14 = new vec3(10,2,4);
+    vec3 *v15 = new vec3(12,-2,2);
+    vec3 *v16 = new vec3(12,2,2);
+
+
+    std::vector<Triangle*> light_triangles;
+    light_triangles.push_back(new Triangle(v13, v14, v15, light_material));
+    light_triangles.push_back(new Triangle(v14, v16, v15, light_material));
+
+    Object3d light_object(light_triangles);
+    objects.push_back(light_object);
+
     // Spheres
     spheres.push_back(new Sphere(vec3(5,-4,-2), 2.0f, diffuse_white_material));
     spheres.push_back(new Sphere(vec3(10,1.5,-2), 2.5f, diffuse_white_material));
@@ -104,19 +104,18 @@ bool Scene::RayIntersection(Ray ray, vec3 &collision_pos, vec3 &collision_normal
     bool collision = false;
 
     // Calculate triangle collision
-    for (std::vector<Object3d>::iterator it = objects.begin(); it != objects.end(); ++it) {
-        Object3d object = *it;
+    for (int o = 0; o < objects.size(); o++) {
+        Object3d object = objects.at(o);
         // Check for object bounding box collision
         if (object.BoundingBoxCollision(ray)) {
-            std::cout << object.get_triangles().size() << std::endl;
-            for (std::vector<Triangle*>::iterator it = object.get_triangles().begin(); it != object.get_triangles().end(); ++it) {
-//                Triangle *triangle = *it;
-//                if (triangle->RayIntersection(ray.get_start_point(), ray.get_direction(), collision_pos)) {
-//                    collision = true;
-//                    collision_normal = triangle->get_normal();
-//                    collision_material = triangle->get_material();
-//                    break;
-//                }
+            for (int tri = 0; tri < object.get_triangles().size(); tri++) {
+                Triangle* triangle = object.get_triangles().at(tri);
+                if (triangle->RayIntersection(ray.get_start_point(), ray.get_direction(), collision_pos)) {
+                    collision = true;
+                    collision_normal = triangle->get_normal();
+                    collision_material = triangle->get_material();
+                    break;
+                }
             }
         }
     }
@@ -139,8 +138,8 @@ bool Scene::RayIntersection(Ray ray, vec3 &collision_pos) {
     bool collision = false;
 
     // Calculate triangle collision
-    for (std::vector<Object3d>::iterator it = objects.begin(); it != objects.end(); ++it) {
-        Object3d object = *it;
+    for (int o = 0; o < objects.size(); o++) {
+        Object3d object = objects.at(o);
 
         // Check for object bounding box collision
         if (object.BoundingBoxCollision(ray)) {
@@ -172,8 +171,8 @@ void Scene::PrepareForRender() {
     // Pre calculate which triangles emit light
     for (std::vector<Object3d>::iterator it = objects.begin(); it != objects.end(); ++it) {
         Object3d object = *it;
-        for (std::vector<Triangle*>::iterator it = object.get_triangles().begin(); it != object.get_triangles().end(); ++it) {
-            Triangle *triangle = *it;
+        for (int tri = 0; tri < object.get_triangles().size(); tri++) {
+            Triangle *triangle = object.get_triangles().at(tri);
             if (triangle->get_material()->get_flux() != 0) {
                 light_emitting_triangles.push_back(triangle);
             }
