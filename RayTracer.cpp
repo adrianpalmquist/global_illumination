@@ -30,7 +30,7 @@ ColorRGB RayTracer::MeanFromPhotonMap(vec3 position, vec3 object_normal) {
     }
 
     float photon_radius = Renderer::PHOTON_RADIUS;
-    radiance = radiance * (1.0f / ((float) M_PI)) * photon_radius;
+    radiance = radiance * (1.0f / ((float) M_PI) * photon_radius * photon_radius);
 
     return radiance;
 }
@@ -40,47 +40,47 @@ ColorRGB RayTracer::MeanFromPhotonMap(vec3 position, vec3 object_normal) {
 ColorRGB RayTracer::TraceShadowRays(Ray ray, vec3 collision_point) {
     ColorRGB radiance_from_light = ColorRGB(0,0,0);
 
-    std::vector<Triangle*> light_emitting_triangles = scene->get_light_emitting_triangles();
-    for (std::vector<Triangle*>::iterator it = light_emitting_triangles.begin(); it != light_emitting_triangles.end(); ++it) {
-        Triangle *triangle = *it;
-        BaseMaterial *emitting_material = triangle->get_material();
-
-        // Generate random rays from collision point to surface
-        int ray_count = 0;
-        float radiance_factor = 0.0f;
-
-        float u, v;
-        while (ray_count < Renderer::NUM_SHADOW_RAYS) {
-
-            // Randomize two points on the emission triangle using Baycentric coordinate
-            u = ((float) rand() / (RAND_MAX)), v = ((float) rand() / (RAND_MAX));
-
-            // Check so that the coordinate sum is less than 1
-            if (u + v < 1) {
-                vec3 ray_endpoint = triangle->BarycentricToCartesian(u, v);
-                vec3 ray_direction = ray_endpoint - collision_point;
-                vec3 ray_collision_pos;
-
-                // Check so that ray is not coming in from behind
-                Ray ray(collision_point, ray_direction, 0);
-                if (scene->RayIntersection(ray, ray_collision_pos)) {
-                    float distance_to_light = length(ray_direction);
-                    float distance_to_collision = length(ray_collision_pos - collision_point);
-
-                    // Check if ray has collided with object before the emission triangle
-                    if (distance_to_light <= distance_to_collision + 0.01) {
-                        radiance_factor += emitting_material->get_flux() * 1.0f / pow(distance_to_light, 2.0f);
-                    }
-                }
-
-                ray_count++;
-            }
-        }
-
-        // Add to radiance factor
-        radiance_factor /= (float) Renderer::NUM_SHADOW_RAYS;
-        radiance_from_light += emitting_material->get_color() * radiance_factor;
-    }
+//    std::vector<Triangle*> light_emitting_triangles = scene->get_light_emitting_triangles();
+//    for (std::vector<Triangle*>::iterator it = light_emitting_triangles.begin(); it != light_emitting_triangles.end(); ++it) {
+//        Triangle *triangle = *it;
+//        BaseMaterial *emitting_material = triangle->get_material();
+//
+//        // Generate random rays from collision point to surface
+//        int ray_count = 0;
+//        float radiance_factor = 0.0f;
+//
+//        float u, v;
+//        while (ray_count < Renderer::NUM_SHADOW_RAYS) {
+//
+//            // Randomize two points on the emission triangle using Baycentric coordinate
+//            u = ((float) rand() / (RAND_MAX)), v = ((float) rand() / (RAND_MAX));
+//
+//            // Check so that the coordinate sum is less than 1
+//            if (u + v < 1) {
+//                vec3 ray_endpoint = triangle->BarycentricToCartesian(u, v);
+//                vec3 ray_direction = ray_endpoint - collision_point;
+//                vec3 ray_collision_pos;
+//
+//                // Check so that ray is not coming in from behind
+//                Ray ray(collision_point, ray_direction, 0);
+//                if (scene->RayIntersection(ray, ray_collision_pos)) {
+//                    float distance_to_light = length(ray_direction);
+//                    float distance_to_collision = length(ray_collision_pos - collision_point);
+//
+//                    // Check if ray has collided with object before the emission triangle
+//                    if (distance_to_light <= distance_to_collision + 0.01) {
+//                        radiance_factor += emitting_material->get_flux() * 1.0f / pow(distance_to_light, 2.0f);
+//                    }
+//                }
+//
+//                ray_count++;
+//            }
+//        }
+//
+//        // Add to radiance factor
+//        radiance_factor /= (float) Renderer::NUM_SHADOW_RAYS;
+//        radiance_from_light += emitting_material->get_color() * radiance_factor;
+//    }
     return radiance_from_light;
 }
 
@@ -94,6 +94,8 @@ ColorRGB RayTracer::TraceRay(Ray ray) {
 
         // Return if ray exceeds max iterations
         if (ray.get_ray_iterations() > 5 || collision_material == nullptr) return ColorRGB(0,0,0);
+
+        return MeanFromPhotonMap(collision_pos, collision_normal);
 
         // Create child rays
         vec3 reflected_dir, transmitted_dir = vec3(0.0);
@@ -117,11 +119,11 @@ ColorRGB RayTracer::TraceRay(Ray ray) {
 
         // Handle diffuse case
         if (material_type == BaseMaterial::DIFFUSE) {
-            ColorRGB incoming_light_radiance = TraceShadowRays(ray, collision_pos);
-            light_radiance = incoming_light_radiance * collision_material->BRDF(ray.get_direction(), vec3(0), collision_normal);
+            //ColorRGB incoming_light_radiance = TraceShadowRays(ray, collision_pos);
+            //light_radiance = incoming_light_radiance * collision_material->BRDF(ray.get_direction(), vec3(0), collision_normal);
 
             if (ray_reflected) {
-                //reflectance_radiance = TraceRay(reflected_ray) * collision_material->BRDF(ray.get_direction(), vec3(0), collision_normal);
+                reflectance_radiance = TraceRay(reflected_ray) * collision_material->BRDF(ray.get_direction(), vec3(0), collision_normal);
             }
 
             return light_radiance + reflectance_radiance;

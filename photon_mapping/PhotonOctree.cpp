@@ -11,13 +11,23 @@ PhotonOctree::PhotonOctree() {
     region = BoundingBox();
 }
 
-PhotonOctree::PhotonOctree(BoundingBox _region, std::vector<Photon*> _photons) {
+PhotonOctree::PhotonOctree(BoundingBox _region, std::vector<Photon*> _photons, int _depth) {
     region = _region;
     photons = _photons;
+    depth = _depth;
 
     for (int a = 0; a < 8; a++) {
         child_nodes[a] = nullptr;
     }
+}
+
+static bool pred(Photon * p) {
+    if (p->should_delete()) {
+        p->restore_deletion();
+        return true;
+    }
+
+    return false;
 }
 
 void PhotonOctree::BuildTree() {
@@ -29,7 +39,7 @@ void PhotonOctree::BuildTree() {
     vec3 dimensions = region.get_max() - region.get_min();
 
     // Check to see if the dimensions of the box are greater than photon radius
-    if (dimensions.x <= 1.0 && dimensions.y <= 1.0 && dimensions.z <= 1.0)
+    if (dimensions.x <= 0.2 && dimensions.y <= 0.2 && dimensions.z <= 0.2)
         return;
 
     vec3 half = dimensions / 2.0f;
@@ -53,28 +63,20 @@ void PhotonOctree::BuildTree() {
     }
 
     // Go through each photon
-    std::vector<Photon*> photons_to_delete;
     for (int i = 0; i < photons.size(); i++) {
         Photon* photon = photons[i];
 
         for (int a = 0; a < 8; a++) {
             if (octant[a].ConainsPoint(photon->get_position())) {
                 octantList[a].push_back(photon);
-                photons_to_delete.push_back(photon);
+                photon->mark_deletion();
                 break;
             }
         }
     }
 
-    // Remove elements that are placed into octants
-    for (int i = 0; i < photons_to_delete.size(); i++) {
-        for (int j = 0; j < photons.size(); j++) {
-            if (photons_to_delete.at(i) == photons.at(j)) {
-                photons.erase(photons.begin() + j);
-                break;
-            }
-        }
-    }
+    // Remove photons pushed into octants
+    photons.erase( std::remove_if( photons.begin(), photons.end(), pred ), photons.end() );
 
     // Create child nodes where there are items contained in the bounding region
     for (int a = 0; a < 8; a++) {
@@ -94,19 +96,25 @@ void PhotonOctree::set_parent(PhotonOctree *_parent) {
 PhotonOctree *PhotonOctree::CreateNode(BoundingBox _region, std::vector<Photon*> _photons) {
     if (_photons.size() == 0)
         return nullptr;
-    PhotonOctree *ret = new PhotonOctree(_region, _photons);
+    PhotonOctree *ret = new PhotonOctree(_region, _photons, 1 + depth);
     ret->set_parent(this);
     return ret;
+}
+
+float sumsum(vec3 vec) {
+    return vec.x + vec.y + vec.z;
 }
 
 std::vector<Photon*> PhotonOctree::GetIntersections(vec3 position) {
     std::vector<Photon*> intersecting_photons = std::vector<Photon*>();
 
     // Check intersections with photons in current node
-    for (int i = 0; i < photons.size(); i++) {
-        Photon* photon = photons.at(i);
+    for (std::vector<Photon*>::iterator it = photons.begin(); it != photons.end(); ++it) {
+        Photon* photon = *it;
+
         float radius = Renderer::PHOTON_RADIUS;
-        if (length((photon->get_position() - position)) < radius) {
+        float squaredDistance = sumsum((photon->get_position() - position) * (photon->get_position() - position));
+        if (squaredDistance < radius * radius) {
             intersecting_photons.push_back(photon);
         }
     }

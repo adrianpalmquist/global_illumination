@@ -13,18 +13,21 @@
 class Object3d {
 public:
     Object3d();
-    Object3d(std::vector<Triangle*> _triangles);
+    Object3d(std::vector<Triangle*> _triangles, BaseMaterial* _material);
 
     bool BoundingBoxCollision(Ray ray);
     void Translate(vec3 translation);
 
     void set_triangles(std::vector<Triangle*> _triangles);
-    std::vector<Triangle*> get_triangles();
-    void add_triangle(Triangle* _triangle);
     void set_smooth_shading(bool smooth_shade);
     void set_position(vec3 _position);
 
-    static Object3d loadObj(std::string _filename);
+    std::vector<Triangle*> get_triangles();
+    BaseMaterial* get_material();
+
+    void add_triangle(Triangle* _triangle);
+
+    static Object3d loadObj(std::string _filename, BaseMaterial* _material);
 private:
     void CalculateBoundingBox();
 
@@ -33,6 +36,7 @@ private:
     vec3 rotation;
 
     std::vector<Triangle*> triangles;
+    BaseMaterial* material;
     BoundingBox bounding_box;
     bool smooth_shading = false;
 };

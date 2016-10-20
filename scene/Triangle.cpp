@@ -9,7 +9,7 @@ Triangle::Triangle() {}
 
 Triangle::~Triangle() {}
 
-Triangle::Triangle(vec3* _v1, vec3* _v2, vec3* _v3, BaseMaterial* _material) : v0(_v1), v1(_v2), v2(_v3), material(_material) {
+Triangle::Triangle(vec3* _v1, vec3* _v2, vec3* _v3) : v0(_v1), v1(_v2), v2(_v3) {
     calculateNormal();
 }
 
@@ -63,10 +63,6 @@ vec3 Triangle::get_reflection(vec3 direction, vec3 normal) {
     vec3 reflected = normalize(direction - 2 * dot(direction,normal) * normal);
 
     return reflected;
-}
-
-BaseMaterial *Triangle::get_material() {
-    return material;
 }
 
 vec3 Triangle::BarycentricToCartesian(float u, float v) {

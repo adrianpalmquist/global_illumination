@@ -10,9 +10,10 @@
 
 Object3d::Object3d() {}
 
-Object3d::Object3d(std::vector<Triangle *> _triangles) {
+Object3d::Object3d(std::vector<Triangle *> _triangles, BaseMaterial* _material) {
     position = vec3(0,0,0);
     triangles = _triangles;
+    material = _material;
     CalculateBoundingBox();
 }
 
@@ -63,9 +64,7 @@ void Object3d::CalculateBoundingBox() {
     bounding_box = BoundingBox(min, max);
 }
 
-Object3d Object3d::loadObj(std::string _filename) {
-    BaseMaterial* mat = new DiffuseMaterial(ColorRGB(1,1,1));
-
+Object3d Object3d::loadObj(std::string _filename, BaseMaterial* _material) {
     std::vector<vec3*> vertices;
     std::vector<Triangle*> triangles;
 
@@ -85,7 +84,7 @@ Object3d Object3d::loadObj(std::string _filename) {
                 std::string string_v2;
                 iss >> string_v0 >> string_v1 >> string_v2;
 
-                Triangle* tri = new Triangle(vertices.at(std::stoi(string_v0)-1), vertices.at(std::stoi(string_v0)-1), vertices.at(std::stoi(string_v0)-1), mat);
+                Triangle* tri = new Triangle(vertices.at(std::stoi(string_v0)-1), vertices.at(std::stoi(string_v1)-1), vertices.at(std::stoi(string_v2)-1));
                 triangles.push_back(tri);
             }
             else if (type == "v") {
@@ -94,13 +93,13 @@ Object3d Object3d::loadObj(std::string _filename) {
                 std::string string_z;
                 iss >> string_x >> string_y >> string_z;
 
-                vertices.push_back(new vec3(std::stof(string_x) + 4, std::stof(string_y), std::stof(string_z)));
+                vertices.push_back(new vec3(std::stof(string_x), std::stof(string_y), std::stof(string_z)));
             }
         }
         obj_file.close();
     }
 
-    return Object3d(triangles);
+    return Object3d(triangles, _material);
 }
 
 bool Object3d::BoundingBoxCollision(Ray ray) {
@@ -108,5 +107,9 @@ bool Object3d::BoundingBoxCollision(Ray ray) {
 }
 
 void Object3d::Translate(vec3 translation) {
+}
+
+BaseMaterial *Object3d::get_material() {
+    return material;
 }
 

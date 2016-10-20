@@ -19,8 +19,8 @@ public:
     static const int PATHTRACING_SAMPLES = 1000;
 
     // Photon mapping settings
-    static const int NUM_PHOTONS = 0;
-    static constexpr float PHOTON_RADIUS = 0.5f;
+    static const int NUM_PHOTONS = 2000000;
+    static constexpr float PHOTON_RADIUS = 0.2f;
 
     int progress_indicator = -1;
 

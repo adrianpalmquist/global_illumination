@@ -51,7 +51,6 @@ void TransmitRay(vec3 direction, vec3 collision_normal, vec3 reflected_direction
 
 int main() {
     srand (time(NULL));
-
     const clock_t begin_time = clock();
 
 //    Sphere test(vec3(0,0,0), 1, new DiffuseMaterial(ColorRGB(1,1,1)));

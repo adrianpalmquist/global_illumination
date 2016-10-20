@@ -14,6 +14,9 @@ Renderer::Renderer() {
 }
 
 void Renderer::Render() {
+    srand (time(NULL));
+    const clock_t begin_time = clock();
+
     scene->PrepareForRender();
 
     // Pass 1: Photon mapping
@@ -46,7 +49,7 @@ void Renderer::Render() {
             }
         }
 
-        std::cout << "Path tracing iteration number: " <<  pathtracing_sample + 1 << std::endl;
+        std::cout << "Path tracing iteration number: " <<  pathtracing_sample + 1 << ", time elapsed: " << float( clock () - begin_time ) /  CLOCKS_PER_SEC << std::endl;
         CreateImage(pathtracing_sample + 1);
     }
 }

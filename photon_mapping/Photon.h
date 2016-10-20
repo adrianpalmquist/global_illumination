@@ -17,10 +17,15 @@ public:
     vec3 get_direction() { return direction; }
 
     const bool operator==(Photon& photon);
+
+    void mark_deletion() { should_be_deleted = true; }
+    void restore_deletion() { should_be_deleted = false; }
+    bool should_delete() { return should_be_deleted; }
 private:
     vec3 position;
     vec3 direction;
     ColorRGB radiance;
+    bool should_be_deleted = false;
 };
 
 
