@@ -6,7 +6,7 @@
 #include "DiffuseMaterial.h"
 
 ColorRGB DiffuseMaterial::BRDF(vec3 incoming_direction, vec3 outgoing_direction, vec3 collision_normal) {
-    return get_color() * (1.0 / M_PI *  ((double) dot(normalize(-incoming_direction), normalize(collision_normal))));
+    return get_color() * ( 1.0 / (M_PI * ((float) dot(normalize(-incoming_direction), normalize(collision_normal))) ));
 }
 
 void DiffuseMaterial::PDF(vec3 ray_direction, vec3 collision_normal, vec3 &reflected_dir, vec3 &transmitted_dir, float &radiance_dist) {

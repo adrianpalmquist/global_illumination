@@ -5,41 +5,53 @@
 #include <iostream>
 #include "Sphere.h"
 
-Sphere::Sphere(vec3 _position, float _radius, BaseMaterial* _material): position(_position), radius(_radius), material(_material) {}
+Sphere::Sphere(vec3 _position, float _radius, BaseMaterial* _material): position(_position), radius(_radius), material(_material) {
+    radius2 = radius*radius; // optimized for ray intersection
+}
 
 float sum(vec3 vec) {
     return vec.x + vec.y + vec.z;
 }
 
 bool Sphere::RayIntersection(vec3 origin, vec3 direction, vec3 &intersection_point, vec3 &normal) {
-    vec3 op = position - origin;
-    float t, epsilon = 0.0001f;
-    float b = dot(op, direction);
-    float disc = b * b - dot(op, op) + radius * radius;
+    float t0, t1;
 
-    if (disc < 0) {
-        return false;
+    vec3 L = origin - position;
+    float a = dot(direction,direction);
+    float b = 2 * dot(direction,L);
+    float c = dot(L,L) - radius2;
+    if (!solveQuadratic(a, b, c, t0, t1)) return false;
+
+    if (t0 > t1) std::swap(t0, t1);
+
+    if (t0 < 0) {
+        t0 = t1; // if t0 is negative, let's use t1 instead
+        if (t0 < 0) return false; // both t0 and t1 are negative
     }
 
-    disc = sqrtf(disc);
+    float t = t0;
 
-    t = b - disc;
-    if (t > epsilon) {
-        intersection_point = origin + direction * t;
-        normal = normalize(intersection_point - position);
-        //normal = dot(normal, direction) < 0 ? normal : -1.0f * normal;
-        return true;
+    intersection_point = origin + direction * t;
+    normal = normalize(intersection_point - position);
+
+    return true;
+}
+
+bool Sphere::solveQuadratic(const float &a, const float &b, const float &c, float &x0, float &x1)
+{
+    float discr = b * b - 4 * a * c;
+    if (discr < 0) return false;
+    else if (discr == 0) x0 = x1 = - 0.5 * b / a;
+    else {
+        float q = (b > 0) ?
+                  -0.5 * (b + sqrt(discr)) :
+                  -0.5 * (b - sqrt(discr));
+        x0 = q / a;
+        x1 = c / q;
     }
+    if (x0 > x1) std::swap(x0, x1);
 
-    t = b + disc;
-    if (t > epsilon) {
-        intersection_point = origin + direction * t;
-        normal = normalize(intersection_point - position);
-        //normal = dot(normal, direction) < 0 ? normal : -1.0f * normal;
-        return true;
-    }
-
-    return false;
+    return true;
 }
 
 vec3 Sphere::get_position() {

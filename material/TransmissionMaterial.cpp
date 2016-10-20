@@ -24,7 +24,7 @@ void TransmissionMaterial::ReflectRay(vec3 direction, vec3 collision_normal, vec
 void TransmissionMaterial::TransmitRay(vec3 direction, vec3 collision_normal, vec3 reflected_direction, float &radiance_dist, bool incoming_ray, vec3 &transmitted_direction) {
     float n1, n2;
     if (!(collision_normal.x == 0 && collision_normal.y == 0 && collision_normal.z == 0)) {
-        vec3 real_normal = !incoming_ray ? collision_normal : -collision_normal;
+        vec3 real_normal = incoming_ray ? collision_normal : -collision_normal;
 
         if (incoming_ray) {
             n1 = 1.0f;

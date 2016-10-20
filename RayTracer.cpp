@@ -62,8 +62,8 @@ ColorRGB RayTracer::TraceShadowRays(Ray ray, vec3 collision_point) {
                 vec3 ray_collision_pos;
 
                 // Check so that ray is not coming in from behind
-                Ray ray(collision_point, ray_direction, 0);
-                if (scene->RayIntersection(ray, ray_collision_pos)) {
+                Ray new_ray(collision_point, ray_direction, 0);
+                if (scene->RayIntersection(new_ray, ray_collision_pos)) {
                     float distance_to_light = length(ray_direction);
                     float distance_to_collision = length(ray_collision_pos - collision_point);
 
@@ -121,7 +121,7 @@ ColorRGB RayTracer::TraceRay(Ray ray) {
             light_radiance = incoming_light_radiance * collision_material->BRDF(ray.get_direction(), vec3(0), collision_normal);
 
             if (ray_reflected) {
-                //reflectance_radiance = TraceRay(reflected_ray) * collision_material->BRDF(ray.get_direction(), vec3(0), collision_normal);
+                reflectance_radiance = TraceRay(reflected_ray) * collision_material->BRDF(ray.get_direction(), vec3(0), collision_normal);
             }
 
             return light_radiance + reflectance_radiance;
@@ -136,6 +136,7 @@ ColorRGB RayTracer::TraceRay(Ray ray) {
         if (material_type == BaseMaterial::TRANSMITTING) {
             return TraceRay(transmitted_ray) * (1.0f - radiance_distribution) + TraceRay(reflected_ray) * radiance_distribution;
         }
+
 
         // Handle emitting case
         if (material_type == BaseMaterial::EMISSION) {
