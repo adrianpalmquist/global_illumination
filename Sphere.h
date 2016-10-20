@@ -19,9 +19,11 @@ public:
     vec3 get_position();
     float get_radius();
     BaseMaterial* get_material();
+    bool solveQuadratic(const float &a, const float &b, const float &c, float &x0, float &x1);
 private:
     vec3 position;
     float radius;
+    float radius2; // radius²
     BaseMaterial* material;
 };
 

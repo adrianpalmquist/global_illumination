@@ -39,7 +39,7 @@ void PhotonOctree::BuildTree() {
     vec3 dimensions = region.get_max() - region.get_min();
 
     // Check to see if the dimensions of the box are greater than photon radius
-    if (dimensions.x <= 0.2 && dimensions.y <= 0.2 && dimensions.z <= 0.2)
+    if (dimensions.x <= 0.4 && dimensions.y <= 0.4 && dimensions.z <= 0.4)
         return;
 
     vec3 half = dimensions / 2.0f;

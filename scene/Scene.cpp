@@ -47,8 +47,8 @@ void Scene::CreateDefaultScene() {
     //objects.push_back(teapot);
 
     // Spheres
-    spheres.push_back(new Sphere(vec3(5,-4,-2), 2.0f, diffuse_white_material));
-    spheres.push_back(new Sphere(vec3(10,1.5,-2), 2.5f, diffuse_white_material));
+    //spheres.push_back(new Sphere(vec3(5,-4,-2), 2.0f, diffuse_white_material));
+    //spheres.push_back(new Sphere(vec3(10,1.5,-2), 2.5f, diffuse_white_material));
 }
 
 Scene::~Scene() {}

@@ -37,12 +37,11 @@ void PhotonMapper::EmitPhoton(vec3 emission_pos, vec3 emission_direction, ColorR
     Ray ray(emission_pos, emission_direction, 0);
     if (scene->RayIntersection(ray, collision_pos, collision_normal, collision_material)) {
         if (collision_material->get_material_type() == BaseMaterial::DIFFUSE) {
-            // Calculate irradiance from emitted radiance and dropoff
-            float distance_to_emission = length(emission_pos - collision_pos);
-            ColorRGB radiance = (collision_material->BRDF(emission_direction, vec3(0), collision_normal) * emission_radiance);
+            ColorRGB radiance = collision_material->BRDF(emission_direction, vec3(0), collision_normal) * emission_radiance;
 
-            if (distance_to_emission < 0.2)
-                radiance = ColorRGB(0,0,0);
+//            float distance_to_emission = length(emission_pos - collision_pos);
+//            if (distance_to_emission < 0.2)
+//                radiance = ColorRGB(0,0,0);
 
             // Add photon to temporary photon map
             temporary_photons.push_back(new Photon(radiance, collision_pos, emission_direction));
@@ -54,7 +53,7 @@ void PhotonMapper::EmitPhoton(vec3 emission_pos, vec3 emission_direction, ColorR
             collision_material->PDF(emission_direction, collision_normal, reflected_dir, transmitted_dir, radiance_distribution);
 
             if (length(reflected_dir) != 0) {
-                ColorRGB reflected_radiance = radiance; // * radiance_distribution;
+                ColorRGB reflected_radiance = radiance;
                 EmitPhoton(collision_pos, reflected_dir, reflected_radiance);
             }
         }
