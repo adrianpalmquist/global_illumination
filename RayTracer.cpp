@@ -59,18 +59,23 @@ ColorRGB RayTracer::TraceShadowRays(Ray ray, vec3 collision_point) {
             if (u + v < 1) {
                 vec3 ray_endpoint = triangle->BarycentricToCartesian(u, v);
                 vec3 ray_direction = ray_endpoint - collision_point;
-                vec3 ray_collision_pos;
+                vec3 ray_collision_pos, ray_collision_norm;
+                BaseMaterial* ray_collision_material;
 
                 // Check so that ray is not coming in from behind
                 Ray new_ray(collision_point, ray_direction, 0);
-                if (scene->RayIntersection(new_ray, ray_collision_pos)) {
-                    float distance_to_light = length(ray_direction);
-                    float distance_to_collision = length(ray_collision_pos - collision_point);
+                //if (scene->RayIntersection(new_ray, ray_collision_pos)) {
+                if(scene->RayIntersection(new_ray, ray_collision_pos, ray_collision_norm, ray_collision_material)) {
+                    if ( dot(triangle->get_normal(), ray_collision_norm) > 0.0f) {
+                        float distance_to_light = length(ray_direction);
+                        float distance_to_collision = length(ray_collision_pos - collision_point);
 
-                    // Check if ray has collided with object before the emission triangle
-                    if (distance_to_light <= distance_to_collision + 0.01) {
-                        radiance_factor += emitting_material->get_flux() * 1.0f / pow(distance_to_light, 2.0f);
+                        // Check if ray has collided with object before the emission triangle
+                        if (distance_to_light <= distance_to_collision + 0.01) {
+                            radiance_factor += emitting_material->get_flux() * 1.0f / pow(distance_to_light, 2.0f);
+                        }
                     }
+                    else radiance_factor = 0.0f;
                 }
 
                 ray_count++;

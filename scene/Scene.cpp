@@ -162,7 +162,6 @@ bool Scene::RayIntersection(Ray ray, vec3 &collision_pos) {
         Sphere * sphere = *it;
         vec3 collision_normal;
         if (sphere->RayIntersection(ray.get_start_point(), ray.get_direction(), collision_pos, collision_normal)) {
-            //std::cout << "shooting ray from (" << ray.get_start_point().x << ", " << ray.get_start_point().y << ", " << ray.get_start_point().z << ") " << std::endl;
             collision = true;
             break;
         }
