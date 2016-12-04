@@ -62,12 +62,12 @@ bool Scene::RayIntersection(Ray ray, vec3 &collision_pos, vec3 &collision_normal
     bool collision = false;
 
     // Calculate triangle collision
-    for (std::vector<Object3d*>::iterator obj_it = objects.begin(); obj_it != objects.end(); ++obj_it) {
-        Object3d* object = *obj_it;
+    for (std::vector<Object3d>::iterator obj_it = objects.begin(); obj_it != objects.end(); ++obj_it) {
+        Object3d object = *obj_it;
 
         // Check for object bounding box collision
-        if (object->BoundingBoxCollision(ray)) {
-            std::vector<Triangle*> triangles = object->get_triangles();
+        if (object.BoundingBoxCollision(ray)) {
+            std::vector<Triangle*> triangles = object.get_triangles();
             for (std::vector<Triangle*>::iterator tri_it = triangles.begin(); tri_it != triangles.end(); ++tri_it) {
                 Triangle* triangle = *tri_it;
                 if (triangle->RayIntersection(ray.get_start_point(), ray.get_direction(), collision_pos)) {
