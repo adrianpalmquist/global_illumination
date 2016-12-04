@@ -10,6 +10,8 @@
 #include "Triangle.h"
 #include "../Sphere.h"
 #include "Object3d.h"
+#include "../Ray.h"
+#include "../material/BaseMaterial.h"
 
 // Forward declaration to avoid circular referencing
 class Ray;
@@ -28,7 +30,7 @@ public:
     std::vector<Sphere*> get_spheres();
 private:
     //PhotonMapper photonMapper;
-    std::vector<Object3d> objects;
+    std::vector<Object3d*> objects;
     std::vector<Triangle*> light_emitting_triangles; // Calucated before render
     std::vector<Sphere*> spheres;
 

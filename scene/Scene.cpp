@@ -42,9 +42,10 @@ void Scene::CreateDefaultScene() {
     Object3d light_plane = Object3d::loadObj("../models/light_plane.obj", emission_material);
     objects.push_back(light_plane);
 
+
     // Teapot object
-    //Object3d teapot = Object3d::loadObj("models/teapot.obj");
-    //objects.push_back(teapot);
+//    Object3d teapot = Object3d::loadObj("models/test.obj");
+//    objects.push_back(teapot);
 
     // Spheres
     spheres.push_back(new Sphere(vec3(5,-4,-2), 2.0f, diffuse_white_material));
@@ -61,12 +62,14 @@ bool Scene::RayIntersection(Ray ray, vec3 &collision_pos, vec3 &collision_normal
     bool collision = false;
 
     // Calculate triangle collision
-    for (int o = 0; o < objects.size(); o++) {
-        Object3d object = objects.at(o);
+    for (std::vector<Object3d*>::iterator obj_it = objects.begin(); obj_it != objects.end(); ++obj_it) {
+        Object3d* object = *obj_it;
+
         // Check for object bounding box collision
-        if (object.BoundingBoxCollision(ray)) {
-            for (int tri = 0; tri < object.get_triangles().size(); tri++) {
-                Triangle* triangle = object.get_triangles().at(tri);
+        if (object->BoundingBoxCollision(ray)) {
+            std::vector<Triangle*> triangles = object->get_triangles();
+            for (std::vector<Triangle*>::iterator tri_it = triangles.begin(); tri_it != triangles.end(); ++tri_it) {
+                Triangle* triangle = *tri_it;
                 if (triangle->RayIntersection(ray.get_start_point(), ray.get_direction(), collision_pos)) {
                     collision = true;
                     collision_normal = triangle->get_normal();
@@ -94,21 +97,21 @@ bool Scene::RayIntersection(Ray ray, vec3 &collision_pos, vec3 &collision_normal
 bool Scene::RayIntersection(Ray ray, vec3 &collision_pos) {
     bool collision = false;
 
-    // Calculate triangle collision
-    for (int o = 0; o < objects.size(); o++) {
-        Object3d object = objects.at(o);
-
-        // Check for object bounding box collision
-        if (object.BoundingBoxCollision(ray)) {
-            for (int tri = 0; tri < object.get_triangles().size(); tri++) {
-                Triangle* triangle = object.get_triangles().at(tri);
-                if (triangle->RayIntersection(ray.get_start_point(), ray.get_direction(), collision_pos)) {
-                    collision = true;
-                    break;
-                }
-            }
-        }
-    }
+//    // Calculate triangle collision
+//    for (int o = 0; o < objects.size(); o++) {
+//        Object3d object = objects.at(o);
+//
+//        // Check for object bounding box collision
+//        if (object.BoundingBoxCollision(ray)) {
+//            for (int tri = 0; tri < object.get_triangles().size(); tri++) {
+//                Triangle* triangle = object.get_triangles().at(tri);
+//                if (triangle->RayIntersection(ray.get_start_point(), ray.get_direction(), collision_pos)) {
+//                    collision = true;
+//                    break;
+//                }
+//            }
+//        }
+//    }
 
     // Calculate sphere intersection
     for (std::vector<Sphere*>::iterator it = spheres.begin(); it != spheres.end(); ++it) {

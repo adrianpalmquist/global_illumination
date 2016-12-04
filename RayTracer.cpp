@@ -99,7 +99,7 @@ ColorRGB RayTracer::TraceRay(Ray ray) {
         // Return if ray exceeds max iterations
         if (ray.get_ray_iterations() > 5 || collision_material == nullptr) return ColorRGB(0,0,0);
 
-        return MeanFromPhotonMap(collision_pos, collision_normal);
+        //return MeanFromPhotonMap(collision_pos, collision_normal);
 
         // Create child rays
         vec3 reflected_dir, transmitted_dir = vec3(0.0);
