@@ -13,7 +13,7 @@ RayTracer::RayTracer() {}
 RayTracer::RayTracer(Scene *_scene): scene(_scene) {}
 
 void RayTracer::StartRayTracing(Ray base_ray) {
-    TraceRay(base_ray);
+    TraceRay(base_ray, true);
 }
 
 // Returns the mean radiance from surrounding photons
@@ -28,7 +28,7 @@ ColorRGB RayTracer::MeanFromPhotonMap(vec3 position, vec3 object_normal) {
     }
 
     float photon_radius = Renderer::PHOTON_RADIUS;
-    radiance = radiance * (1.0f / ((float) M_PI) * photon_radius * photon_radius);
+    radiance = radiance * (1.0f / ((float) M_PI) * photon_radius * photon_radius) / 1000.0f;
 
     return radiance;
 }
@@ -84,7 +84,7 @@ ColorRGB RayTracer::TraceShadowRays(Ray ray, vec3 collision_point, vec3 surface_
     return radiance_from_light * radiance_factor;
 }
 
-ColorRGB RayTracer::TraceRay(Ray ray) {
+ColorRGB RayTracer::TraceRay(Ray ray, bool perform_full_calc) {
     vec3 collision_normal, collision_pos;
     BaseMaterial* collision_material = nullptr;
 
@@ -117,32 +117,42 @@ ColorRGB RayTracer::TraceRay(Ray ray) {
         ColorRGB light_radiance, reflectance_radiance, transmission_radiance;
         int material_type = collision_material->get_material_type();
 
-        // Handle diffuse case
-        if (material_type == BaseMaterial::DIFFUSE) {
-            ColorRGB incoming_light_radiance = TraceShadowRays(ray, collision_pos, collision_normal);
-            light_radiance = incoming_light_radiance * collision_material->BRDF(ray.get_direction(), vec3(0), collision_normal);
-
-            if (ray_reflected) {
-                reflectance_radiance = TraceRay(reflected_ray) * collision_material->BRDF(ray.get_direction(), vec3(0), collision_normal);
-            }
-
-            return light_radiance + reflectance_radiance;
-        }
-
         // Handle specular/perfect reflection case
         if (material_type == BaseMaterial::SPECULAR) {
-            return TraceRay(reflected_ray) * collision_material->BRDF(ray.get_direction(), vec3(0), collision_normal);
+            if (perform_full_calc) {
+                return TraceRay(reflected_ray, true) * collision_material->BRDF(ray.get_direction(), vec3(0), collision_normal);
+            }
+            else {
+                return TraceRay(reflected_ray, false) * collision_material->BRDF(ray.get_direction(), vec3(0), collision_normal);
+            }
         }
 
         // Handle transmitting cae
-        if (material_type == BaseMaterial::TRANSMITTING) {
-            return TraceRay(transmitted_ray) * (1.0f - radiance_distribution) + TraceRay(reflected_ray) * radiance_distribution;
+        else if (material_type == BaseMaterial::TRANSMITTING) {
+            return TraceRay(transmitted_ray, true) * (1.0f - radiance_distribution) + TraceRay(reflected_ray, true) * radiance_distribution;
         }
 
-
         // Handle emitting case
-        if (material_type == BaseMaterial::EMISSION) {
-            //return collision_material->BRDF(ray.get_direction(), vec3(0), collision_normal);
+        else if (material_type == BaseMaterial::EMISSION && perform_full_calc) {
+            return collision_material->BRDF(ray.get_direction(), vec3(0), collision_normal);
+        }
+
+        // Handle diffuse case
+        else if (material_type == BaseMaterial::DIFFUSE || material_type == BaseMaterial::OREN_NAYAR) {
+            if (!perform_full_calc) {
+                return MeanFromPhotonMap(collision_pos, collision_normal);
+            }
+            else {
+                ColorRGB incoming_light_radiance = TraceShadowRays(ray, collision_pos, collision_normal);
+                light_radiance = incoming_light_radiance * collision_material->BRDF(ray.get_direction(), reflected_dir, collision_normal);
+
+                if (ray_reflected) {
+                    reflectance_radiance = TraceRay(reflected_ray, false) * collision_material->BRDF(ray.get_direction(), reflected_dir, collision_normal);
+                }
+
+                return light_radiance + reflectance_radiance;
+            }
+
         }
     }
 

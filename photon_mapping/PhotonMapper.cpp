@@ -36,8 +36,13 @@ void PhotonMapper::EmitPhoton(vec3 emission_pos, vec3 emission_direction, ColorR
 
     Ray ray(emission_pos, emission_direction, 0);
     if (scene->RayIntersection(ray, collision_pos, collision_normal, collision_material)) {
-        if (collision_material->get_material_type() == BaseMaterial::DIFFUSE) {
-            ColorRGB radiance = collision_material->BRDF(emission_direction, vec3(0), collision_normal) * emission_radiance;
+        if (collision_material->get_material_type() == BaseMaterial::DIFFUSE || collision_material->get_material_type() == BaseMaterial::OREN_NAYAR) {
+            // Check material BRDF if we get reflected/transmitted rays
+            vec3 reflected_dir, transmitted_dir;
+            float radiance_distribution = 1.0;
+            collision_material->PDF(emission_direction, collision_normal, reflected_dir, transmitted_dir, radiance_distribution);
+
+            ColorRGB radiance = collision_material->BRDF(emission_direction, reflected_dir, collision_normal) * emission_radiance;
 
 //            float distance_to_emission = length(emission_pos - collision_pos);
 //            if (distance_to_emission < 0.2)
@@ -46,11 +51,6 @@ void PhotonMapper::EmitPhoton(vec3 emission_pos, vec3 emission_direction, ColorR
             // Add photon to temporary photon map
             temporary_photons.push_back(new Photon(radiance, collision_pos, emission_direction));
             emitted_photons++;
-
-            // Check material BRDF if we get reflected/transmitted rays
-            vec3 reflected_dir, transmitted_dir;
-            float radiance_distribution = 1.0;
-            collision_material->PDF(emission_direction, collision_normal, reflected_dir, transmitted_dir, radiance_distribution);
 
             if (length(reflected_dir) != 0) {
                 ColorRGB reflected_radiance = radiance;
@@ -64,7 +64,12 @@ void PhotonMapper::Start() {
     srand (time(NULL));
     const clock_t begin_time = clock();
 
-    emitting_triangles = scene->get_light_emitting_triangles();
+    std::vector<Object3d> emitting_objects = scene->get_light_emitting_objects();
+    for (int i = 0; i < emitting_objects.size(); i++) {
+        for (int j = 0; j < emitting_objects.at(i).get_triangles().size(); j++) {
+            emitting_triangles.push_back(emitting_objects.at(i).get_triangles().at(j));
+        }
+    }
 
     std::random_device rd;     // only used once to initialise (seed) engine
     std::mt19937 rng(rd());    // random-number engine used (Mersenne-Twister in this case)
@@ -74,7 +79,7 @@ void PhotonMapper::Start() {
         // Randomize triangle to emit from
         int triangle_index = uni(rng);
         Triangle* triangle = emitting_triangles.at(triangle_index);
-        ColorRGB emitted_radiance = ColorRGB(5, 5, 5); //triangle->get_material()->get_color() * triangle->get_material()->get_flux();
+        ColorRGB emitted_radiance = ColorRGB(1000, 1000, 1000); //triangle->get_material()->get_color() * triangle->get_material()->get_flux();
 
         // Calculate emission position and direction from emission triangle
         vec3 emission_pos = triangle->RandomizePointOnTriangle();

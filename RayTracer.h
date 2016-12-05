@@ -15,7 +15,7 @@ public:
     RayTracer();
     RayTracer(Scene* _scene);
     void StartRayTracing(Ray base_ray);
-    ColorRGB TraceRay(Ray ray);
+    ColorRGB TraceRay(Ray ray, bool perform_full_calc);
 
     void set_photon_map(PhotonOctree* _photon_map);
 

@@ -15,6 +15,7 @@ public:
     static const int SPECULAR = 1;
     static const int TRANSMITTING = 2;
     static const int EMISSION = 3;
+    static const int OREN_NAYAR = 4;
 
     int type;
 

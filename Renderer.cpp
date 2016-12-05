@@ -20,8 +20,8 @@ void Renderer::Render() {
     scene->PrepareForRender();
 
     // Pass 1: Photon mapping
-    //photon_mapper.Start();
-    //ray_tracer.set_photon_map(photon_mapper.get_photon_map());
+    photon_mapper.Start();
+    ray_tracer.set_photon_map(photon_mapper.get_photon_map());
 
     std::vector<vec3> sampled_directions;
     vec3 direction;
@@ -40,7 +40,7 @@ void Renderer::Render() {
                 for (std::vector<vec3>::iterator it = sampled_directions.begin(); it != sampled_directions.end(); ++it) {
                     direction = *it;
                     Ray parent_ray = Ray(vec3(origin), direction, 0);
-                    pixel_color += ray_tracer.TraceRay(parent_ray) / ((float) ANTI_ALIASING_SAMPLES);
+                    pixel_color += ray_tracer.TraceRay(parent_ray, true) / ((float) ANTI_ALIASING_SAMPLES);
                 }
 
                 //progessIndicator(((double)(x+y*Camera::CAMERA_HEIGHT))/( (double)(Camera::CAMERA_HEIGHT * Camera::CAMERA_WIDTH)));

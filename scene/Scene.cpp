@@ -6,10 +6,11 @@
 #include "Scene.h"
 #include "../Ray.h"
 #include "../material/BaseMaterial.h"
-#include "../material/DiffuseMaterial.h"
 #include "../material/SpecularMaterial.h"
 #include "../material/EmissionMaterial.h"
+#include "../material/OrenNayarMaterial.h"
 #include "../material/TransmissionMaterial.h"
+#include "../material/DiffuseMaterial.h"
 
 
 Scene::Scene() {
@@ -18,14 +19,14 @@ Scene::Scene() {
 
 void Scene::CreateDefaultScene() {
     // Materials
-    BaseMaterial* diffuse_red_material = new DiffuseMaterial(ColorRGB(1,0,0));
-    BaseMaterial* diffuse_green_material = new DiffuseMaterial(ColorRGB(0,1,0));
-    BaseMaterial* diffuse_blue_material = new DiffuseMaterial(ColorRGB(0,0,1));
-    BaseMaterial* diffuse_yellow_material = new DiffuseMaterial(ColorRGB(1,1,0));
-    BaseMaterial* diffuse_white_material = new DiffuseMaterial(ColorRGB(1,1,1));
-    BaseMaterial* specular_white_material = new SpecularMaterial(ColorRGB(1,1,1));
-    BaseMaterial* transmission_material = new TransmissionMaterial(ColorRGB(1,1,1));
-    BaseMaterial* emission_material = new EmissionMaterial(ColorRGB(1,1,1), 1000);
+    BaseMaterial* diffuse_red_material = new OrenNayarMaterial(ColorRGB(1,0,0));
+    BaseMaterial* diffuse_green_material = new OrenNayarMaterial(ColorRGB(0,1,0));
+    BaseMaterial* diffuse_blue_material = new OrenNayarMaterial(ColorRGB(0,0,1));
+    BaseMaterial* diffuse_yellow_material = new OrenNayarMaterial(ColorRGB(1,1,0));
+    BaseMaterial* diffuse_white_material = new OrenNayarMaterial(ColorRGB(1,1,1));
+    BaseMaterial* specular_red_material = new SpecularMaterial(ColorRGB(1.0, 0.2, 0.2));
+    BaseMaterial* transmission_material = new TransmissionMaterial(ColorRGB(1,0,1));
+    BaseMaterial* emission_material = new EmissionMaterial(ColorRGB(1,1,1), 500);
 
     // Room objects
     Object3d floor = Object3d::loadObj("../models/floor.obj", diffuse_white_material);
@@ -48,8 +49,8 @@ void Scene::CreateDefaultScene() {
 //    objects.push_back(teapot);
 
     // Spheres
-    spheres.push_back(new Sphere(vec3(5,-4,-2), 2.0f, diffuse_white_material));
-    spheres.push_back(new Sphere(vec3(10,1.5,-2), 2.5f, diffuse_white_material));
+    spheres.push_back(new Sphere(vec3(5,-4,-2), 2.0f, diffuse_blue_material));
+    spheres.push_back(new Sphere(vec3(10,1.5,-2), 2.5f, specular_red_material));
 }
 
 Scene::~Scene() {}
