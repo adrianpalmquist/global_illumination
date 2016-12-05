@@ -25,7 +25,7 @@ private:
 
     PhotonOctree* photon_map;
 
-    ColorRGB TraceShadowRays(Ray ray, vec3 collision_point);
+    ColorRGB TraceShadowRays(Ray ray, vec3 collision_point, vec3 surface_normal);
     ColorRGB MeanFromPhotonMap(vec3 position, vec3 object_normal);
 };
 

@@ -20,6 +20,7 @@ public:
 
     vec3 get_normal();
     vec3 get_reflection(vec3 direction, vec3 normal);
+    float get_triangle_area();
 
     vec3* get_v0() { return v0; }
     vec3* get_v1() { return v1; }
@@ -31,7 +32,9 @@ private:
     vec3* v1;
     vec3* v2;
     vec3 normal;
+    float triangle_area;
 
+    void calculate_triangle_area();
     void calculateNormal();
 };
 

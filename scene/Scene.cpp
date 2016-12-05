@@ -131,15 +131,17 @@ void Scene::PrepareForRender() {
     // Pre calculate which triangles emit light
     for (std::vector<Object3d>::iterator it = objects.begin(); it != objects.end(); ++it) {
         Object3d object = *it;
-        for (int tri = 0; tri < object.get_triangles().size(); tri++) {
-            Triangle *triangle = object.get_triangles().at(tri);
-            if (object.get_material()->get_flux() != 0) {
-                light_emitting_triangles.push_back(triangle);
-            }
+
+        if (object.get_material()->get_flux() != 0) {
+            light_emitting_objects.push_back(object);
         }
     }
 }
 
 std::vector<Triangle *> Scene::get_light_emitting_triangles() {
     return light_emitting_triangles;
+}
+
+std::vector<Object3d> Scene::get_light_emitting_objects() {
+    return light_emitting_objects;
 }

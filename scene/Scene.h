@@ -27,11 +27,13 @@ public:
 
     //std::vector<Triangle*> get_triangles();
     std::vector<Triangle*> get_light_emitting_triangles();
+    std::vector<Object3d> get_light_emitting_objects();
     std::vector<Sphere*> get_spheres();
 private:
     //PhotonMapper photonMapper;
     std::vector<Object3d> objects;
     std::vector<Triangle*> light_emitting_triangles; // Calucated before render
+    std::vector<Object3d> light_emitting_objects; // Calucated before render
     std::vector<Sphere*> spheres;
 
     void CreateDefaultScene();

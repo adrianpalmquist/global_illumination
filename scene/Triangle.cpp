@@ -11,6 +11,7 @@ Triangle::~Triangle() {}
 
 Triangle::Triangle(vec3* _v1, vec3* _v2, vec3* _v3) : v0(_v1), v1(_v2), v2(_v3) {
     calculateNormal();
+    calculate_triangle_area();
 }
 
 // Calculates normal from vertices
@@ -85,4 +86,14 @@ vec3 Triangle::RandomizePointOnTriangle() {
 //            return BarycentricToCartesian(u, v);
 //        }
 //    }
+}
+
+void Triangle::calculate_triangle_area() {
+    vec3 edge1 = *v1 - *v0;
+    vec3 edge2 = *v2 - *v0;
+    triangle_area = 0.5f * length(cross(edge1, edge2));
+}
+
+float Triangle::get_triangle_area() {
+    return triangle_area;
 }
