@@ -25,7 +25,7 @@ void Scene::CreateDefaultScene() {
     BaseMaterial* diffuse_yellow_material = new OrenNayarMaterial(ColorRGB(1,1,0));
     BaseMaterial* diffuse_white_material = new OrenNayarMaterial(ColorRGB(1,1,1));
     BaseMaterial* specular_red_material = new SpecularMaterial(ColorRGB(1.0, 0.2, 0.2));
-    BaseMaterial* transmission_material = new TransmissionMaterial(ColorRGB(1,0,1));
+    BaseMaterial* transmission_material = new TransmissionMaterial(ColorRGB(1,1,1));
     BaseMaterial* emission_material = new EmissionMaterial(ColorRGB(1,1,1), 500);
 
     // Room objects
@@ -50,7 +50,7 @@ void Scene::CreateDefaultScene() {
 
     // Spheres
     spheres.push_back(new Sphere(vec3(5,-4,-2), 2.0f, diffuse_blue_material));
-    spheres.push_back(new Sphere(vec3(10,1.5,-2), 2.5f, specular_red_material));
+    spheres.push_back(new Sphere(vec3(10,1.5,-2), 2.5f, transmission_material));
 }
 
 Scene::~Scene() {}
@@ -83,7 +83,7 @@ bool Scene::RayIntersection(Ray ray, vec3 &collision_pos, vec3 &collision_normal
 
     // Calculate sphere intersection
     for (std::vector<Sphere*>::iterator it = spheres.begin(); it != spheres.end(); ++it) {
-        Sphere * sphere = *it;
+        Sphere *sphere = *it;
         if (sphere->RayIntersection(ray.get_start_point(), ray.get_direction(), collision_pos, collision_normal)) {
             collision_material = sphere->get_material();
             collision = true;

@@ -13,6 +13,7 @@ Ray::Ray() {
     ray_clr = ColorRGB(0,0,0);
     start_point = vec3(0);
     end_point = vec3(0);
+    ray_iteration = 0;
 }
 
 Ray::~Ray() {}

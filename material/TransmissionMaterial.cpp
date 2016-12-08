@@ -13,7 +13,8 @@ void TransmissionMaterial::PDF(vec3 ray_direction, vec3 collision_normal, vec3 &
     bool incoming_ray = dot(collision_normal, ray_direction) < 0.0f;
 
     // Should not reflect ray if inside object
-    if (incoming_ray) ReflectRay(ray_direction, collision_normal, reflected_dir);
+    if (incoming_ray)
+        ReflectRay(ray_direction, collision_normal, reflected_dir);
     TransmitRay(ray_direction, collision_normal, reflected_dir, radiance_dist, incoming_ray, transmitted_dir);
 }
 
@@ -36,6 +37,7 @@ void TransmissionMaterial::TransmitRay(vec3 direction, vec3 collision_normal, ve
             n2 = 1.0f;
         }
 
+
         transmitted_direction = normalize((n1 / n2) * direction + real_normal * (
                 -(n1 / n2) * dot(real_normal, direction) -
                 sqrtf(1.0f - powf((n1 / n2), 2.0f) * (1.0f - (powf(dot(real_normal, direction), 2))))));
@@ -47,7 +49,7 @@ void TransmissionMaterial::TransmitRay(vec3 direction, vec3 collision_normal, ve
                                  (n1 * sqrtf(1.0f - pow((n1 / n2) * sinf(angle), 2.0f)) + n2 * cosf(angle)), 2.0f);
 
         radiance_dist = (r_s + r_p) / 2;
-        radiance_dist = 0.0f;
+        //radiance_dist = 0.0f;
 
         if (!incoming_ray && angle > 0.73f) {
             radiance_dist = 1.0f;

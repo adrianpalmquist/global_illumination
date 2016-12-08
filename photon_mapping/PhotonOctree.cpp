@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <algorithm>
 #include "PhotonOctree.h"
 #include "../Renderer.h"
 

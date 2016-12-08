@@ -129,6 +129,7 @@ ColorRGB RayTracer::TraceRay(Ray ray, bool perform_full_calc) {
 
         // Handle transmitting cae
         else if (material_type == BaseMaterial::TRANSMITTING) {
+            if (!ray_reflected) return TraceRay(transmitted_ray,true);
             return TraceRay(transmitted_ray, true) * (1.0f - radiance_distribution) + TraceRay(reflected_ray, true) * radiance_distribution;
         }
 
