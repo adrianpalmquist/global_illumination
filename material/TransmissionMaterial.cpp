@@ -15,6 +15,7 @@ void TransmissionMaterial::PDF(vec3 ray_direction, vec3 collision_normal, vec3 &
     // Should not reflect ray if inside object
     if (incoming_ray)
         ReflectRay(ray_direction, collision_normal, reflected_dir);
+
     TransmitRay(ray_direction, collision_normal, reflected_dir, radiance_dist, incoming_ray, transmitted_dir);
 }
 
@@ -32,7 +33,6 @@ void TransmissionMaterial::TransmitRay(vec3 direction, vec3 collision_normal, ve
             n2 = 1.5f;
         }
         else {
-            //std::cout << "outgoing" << std::endl;
             n1 = 1.5f;
             n2 = 1.0f;
         }
@@ -54,7 +54,6 @@ void TransmissionMaterial::TransmitRay(vec3 direction, vec3 collision_normal, ve
         // Solution from: https://graphics.stanford.edu/courses/cs148-10-summer/docs/2006--degreve--reflection_refraction.pdf
         float sin_theta_2 = powf((n1/n2),2) * (1.0f - powf(cosf(angle),2));
         transmitted_direction = normalize((n1/n2) * direction + ((n1/n2) * cosf(angle) - sqrt(1.0f - sin_theta_2)) * real_normal);
-
 
         radiance_dist = (r_s + r_p) / 2;
         //radiance_dist = 1.0f;

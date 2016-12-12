@@ -21,7 +21,7 @@ void Renderer::Render() {
 
     // Pass 1: Photon mapping
     photon_mapper.Start();
-    ray_tracer.set_photon_map(photon_mapper.get_photon_map());
+    ray_tracer.set_photon_map(photon_mapper.get_photon_map(), photon_mapper.get_caustics_photon_map());
 
     std::vector<vec3> sampled_directions;
     vec3 direction;

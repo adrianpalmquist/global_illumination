@@ -23,6 +23,7 @@ public:
 
     bool RayIntersection(Ray ray, vec3 &collision_pos, vec3 &collision_normal, BaseMaterial *&collision_material);
     bool RayIntersection(Ray ray, vec3 &collision_pos);
+    bool ShadowRayIntersection(Ray ray, vec3 &collision_pos);
     void PrepareForRender();
 
     //std::vector<Triangle*> get_triangles();

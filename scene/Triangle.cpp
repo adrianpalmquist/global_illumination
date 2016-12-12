@@ -71,21 +71,21 @@ vec3 Triangle::BarycentricToCartesian(float u, float v) {
 }
 
 vec3 Triangle::RandomizePointOnTriangle() {
-    float u = ((float) rand() / (RAND_MAX));
-    float v = (1.0f - u) * ((float) rand() / (RAND_MAX));
-    return BarycentricToCartesian(u, v);
-//    float u, v;
-//
-//    while (true) {
-//        // Randomize two points on the emission triangle using Baycentric coordinate
-//        u = ((float) rand() / (RAND_MAX));
-//        v = ((float) rand() / (RAND_MAX));
-//
-//        // Check so that the coordinate sum is less than 1
-//        if (u + v < 1) {
-//            return BarycentricToCartesian(u, v);
-//        }
-//    }
+//    float u = ((float) rand() / (RAND_MAX));
+//    float v = (1.0f - u) * ((float) rand() / (RAND_MAX));
+//    return BarycentricToCartesian(u, v);
+    float u, v;
+
+    while (true) {
+        // Randomize two points on the emission triangle using Baycentric coordinate
+        u = ((float) rand() / (RAND_MAX));
+        v = ((float) rand() / (RAND_MAX));
+
+        // Check so that the coordinate sum is less than 1
+        if (u + v < 1) {
+            return BarycentricToCartesian(u, v);
+        }
+    }
 }
 
 void Triangle::calculate_triangle_area() {

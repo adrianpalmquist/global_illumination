@@ -28,7 +28,24 @@ ColorRGB RayTracer::MeanFromPhotonMap(vec3 position, vec3 object_normal) {
     }
 
     float photon_radius = Renderer::PHOTON_RADIUS;
-    radiance = radiance * (1.0f / ((float) M_PI) * photon_radius * photon_radius) / 1000.0f;
+    radiance = radiance * (1.0f / ((float) M_PI) * photon_radius * photon_radius) / 500.0f;
+
+    return radiance;
+}
+
+// Returns the mean radiance from surrounding photons
+ColorRGB RayTracer::MeanFromCausticsPhotonMap(vec3 position, vec3 object_normal) {
+    ColorRGB radiance(0,0,0);
+    std::vector<Photon*> photons = caustics_photon_map->GetIntersections(position);
+
+    for (int i = 0; i < photons.size(); i++) {
+        if (dot(-photons.at(i)->get_direction(), object_normal) > 0) {
+            radiance += photons.at(i)->get_radiance();
+        }
+    }
+
+    float photon_radius = Renderer::CAUSTIC_PHOTON_RADIUS;
+    radiance = radiance * (1.0f / ((float) M_PI) * photon_radius * photon_radius) / 500.0f;
 
     return radiance;
 }
@@ -95,6 +112,7 @@ ColorRGB RayTracer::TraceRay(Ray ray, bool perform_full_calc) {
         // Return if ray exceeds max iterations
         if (ray.get_ray_iterations() > 5 || collision_material == nullptr) return ColorRGB(0,0,0);
 
+        return MeanFromCausticsPhotonMap(collision_pos, collision_normal);
         //return MeanFromPhotonMap(collision_pos, collision_normal);
 
         // Create child rays
@@ -105,12 +123,12 @@ ColorRGB RayTracer::TraceRay(Ray ray, bool perform_full_calc) {
         float radiance_distribution = 1.0f;
         collision_material->PDF(ray.get_direction(), collision_normal, reflected_dir, transmitted_dir, radiance_distribution);
 
-        if (!(reflected_dir.x == 0 && reflected_dir.y == 0 && reflected_dir.z == 0)) {
+        if (!length(reflected_dir) == 0) {
             reflected_ray = Ray(ray.get_end_point() + reflected_dir * 0.05f, reflected_dir, 1 + ray.get_ray_iterations());
             ray_reflected = true;
         }
 
-        if (!(transmitted_dir.x == 0 && transmitted_dir.y == 0 && transmitted_dir.z == 0)) {
+        if (!length(transmitted_dir) == 0) {
             transmitted_ray = Ray(ray.get_end_point() + transmitted_dir * 0.05f, transmitted_dir, 1 + ray.get_ray_iterations());
         }
 
@@ -127,10 +145,12 @@ ColorRGB RayTracer::TraceRay(Ray ray, bool perform_full_calc) {
             }
         }
 
-        // Handle transmitting cae
+        // Handle transmitting case
         else if (material_type == BaseMaterial::TRANSMITTING) {
-            if (!ray_reflected) return TraceRay(transmitted_ray,true);
-            return TraceRay(transmitted_ray, true) * (1.0f - radiance_distribution) + TraceRay(reflected_ray, true) * radiance_distribution;
+            if (ray.get_ray_iterations() < 2) {
+                if (!ray_reflected) return TraceRay(transmitted_ray, true);
+                return TraceRay(transmitted_ray, true) * (1.0f - radiance_distribution) + TraceRay(reflected_ray, true) * radiance_distribution;
+            }
         }
 
         // Handle emitting case
@@ -161,8 +181,9 @@ ColorRGB RayTracer::TraceRay(Ray ray, bool perform_full_calc) {
     return ColorRGB(0,0,0);
 }
 
-void RayTracer::set_photon_map(PhotonOctree* _photon_map) {
+void RayTracer::set_photon_map(PhotonOctree* _photon_map, PhotonOctree* _caustics_photon_map) {
     photon_map = _photon_map;
+    caustics_photon_map = _caustics_photon_map;
 }
 
 

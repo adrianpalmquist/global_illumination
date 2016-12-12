@@ -51,7 +51,7 @@ void Scene::CreateDefaultScene() {
     // Spheres
     //spheres.push_back(new Sphere(vec3(5,-4,-2), 2.0f, diffuse_blue_material));
     //spheres.push_back(new Sphere(vec3(10,1.5,-2), 2.5f, transmission_material)); // too close to wall
-    spheres.push_back(new Sphere(vec3(9,0.1,-2), 1.5f, transmission_material));
+    spheres.push_back(new Sphere(vec3(9,0.8,-2), 2.0f, transmission_material));
 }
 
 Scene::~Scene() {}
@@ -94,6 +94,41 @@ bool Scene::RayIntersection(Ray ray, vec3 &collision_pos, vec3 &collision_normal
 
     return collision;
 
+}
+
+bool ShadowRayIntersection(Ray ray, vec3 &collision_pos) {
+    bool collision = false;
+
+//    // Calculate triangle collision
+//    for (std::vector<Object3d>::iterator obj_it = objects.begin(); obj_it != objects.end(); ++obj_it) {
+//        Object3d object = *obj_it;
+//
+//        // Check for object bounding box collision
+//        if (object.BoundingBoxCollision(ray)) {
+//            std::vector<Triangle*> triangles = object.get_triangles();
+//            for (std::vector<Triangle*>::iterator tri_it = triangles.begin(); tri_it != triangles.end(); ++tri_it) {
+//                Triangle* triangle = *tri_it;
+//                if (triangle->RayIntersection(ray.get_start_point(), ray.get_direction(), collision_pos)) {
+//
+//                    collision = true;
+//                    collision_material = object.get_material();
+//                    break;
+//                }
+//            }
+//        }
+//    }
+//
+//    // Calculate sphere intersection
+//    for (std::vector<Sphere*>::iterator it = spheres.begin(); it != spheres.end(); ++it) {
+//        Sphere *sphere = *it;
+//        if (sphere->RayIntersection(ray.get_start_point(), ray.get_direction(), collision_pos, collision_normal)) {
+//            collision_material = sphere->get_material();
+//            collision = true;
+//            break;
+//        }
+//    }
+
+    return collision;
 }
 
 bool Scene::RayIntersection(Ray ray, vec3 &collision_pos) {

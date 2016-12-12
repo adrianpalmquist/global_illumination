@@ -38,23 +38,54 @@ void PhotonMapper::EmitPhoton(vec3 emission_pos, vec3 emission_direction, ColorR
     if (scene->RayIntersection(ray, collision_pos, collision_normal, collision_material)) {
         if (collision_material->get_material_type() == BaseMaterial::DIFFUSE || collision_material->get_material_type() == BaseMaterial::OREN_NAYAR) {
             // Check material BRDF if we get reflected/transmitted rays
-            vec3 reflected_dir, transmitted_dir;
+            vec3 reflected_dir, transmitted_dir = vec3(0.0);
             float radiance_distribution = 1.0;
+
             collision_material->PDF(emission_direction, collision_normal, reflected_dir, transmitted_dir, radiance_distribution);
 
             ColorRGB radiance = collision_material->BRDF(emission_direction, reflected_dir, collision_normal) * emission_radiance;
-
-//            float distance_to_emission = length(emission_pos - collision_pos);
-//            if (distance_to_emission < 0.2)
-//                radiance = ColorRGB(0,0,0);
 
             // Add photon to temporary photon map
             temporary_photons.push_back(new Photon(radiance, collision_pos, emission_direction));
             emitted_photons++;
 
-            if (length(reflected_dir) != 0) {
-                ColorRGB reflected_radiance = radiance;
-                EmitPhoton(collision_pos, reflected_dir, reflected_radiance);
+            if (length(reflected_dir) != 0 && !isnan(length(reflected_dir))) {
+                EmitPhoton(collision_pos + reflected_dir * 0.01f, reflected_dir, radiance);
+            }
+        }
+    }
+}
+
+void PhotonMapper::EmitCausticsPhoton(vec3 emission_pos, vec3 emission_direction, ColorRGB emission_radiance, bool arriving_from_transmission) {
+    vec3 collision_pos, collision_normal;
+    BaseMaterial* collision_material;
+
+    Ray ray(emission_pos, emission_direction, 0);
+    if (scene->RayIntersection(ray, collision_pos, collision_normal, collision_material)) {
+        if (arriving_from_transmission && (collision_material->get_material_type() == BaseMaterial::DIFFUSE || collision_material->get_material_type() == BaseMaterial::OREN_NAYAR)) {
+            // Check material BRDF if we get reflected/transmitted rays
+            vec3 reflected_dir, transmitted_dir = vec3(0.0);
+            float radiance_distribution = 1.0;
+
+            collision_material->PDF(emission_direction, collision_normal, reflected_dir, transmitted_dir, radiance_distribution);
+
+            ColorRGB radiance = collision_material->BRDF(emission_direction, reflected_dir, collision_normal) * emission_radiance;
+
+            // Add photon to temporary photon map
+            temporary_caustics_photons.push_back(new Photon(radiance, collision_pos, emission_direction));
+            emitted_caustics_photons++;
+        }
+
+        if (collision_material->get_material_type() == BaseMaterial::TRANSMITTING) {
+            // Check material BRDF if we get reflected/transmitted rays
+            vec3 reflected_dir, transmitted_dir = vec3(0.0);
+            float radiance_distribution = 1.0;
+
+            collision_material->PDF(emission_direction, collision_normal, reflected_dir, transmitted_dir, radiance_distribution);
+            ColorRGB radiance = collision_material->BRDF(emission_direction, reflected_dir, collision_normal) * emission_radiance;
+
+            if (length(transmitted_dir) != 0 && !isnan(length(transmitted_dir))) {
+                EmitCausticsPhoton(collision_pos + transmitted_dir * 0.01f, transmitted_dir, radiance, true);
             }
         }
     }
@@ -79,14 +110,27 @@ void PhotonMapper::Start() {
         // Randomize triangle to emit from
         int triangle_index = uni(rng);
         Triangle* triangle = emitting_triangles.at(triangle_index);
-        ColorRGB emitted_radiance = ColorRGB(1000, 1000, 1000); //triangle->get_material()->get_color() * triangle->get_material()->get_flux();
+        ColorRGB emitted_radiance = ColorRGB(500, 500, 500); //triangle->get_material()->get_color() * triangle->get_material()->get_flux();
+
+        // Calculate emission position and direction from emission triangle
+        vec3 emission_pos = triangle->RandomizePointOnTriangle();
+        vec3 emission_direction = CosineDistributeDirection(triangle->get_normal());
+
+        EmitPhoton(emission_pos, emission_direction, emitted_radiance);
+    }
+
+    while (emitted_caustics_photons < Renderer::NUM_CAUSTICS_PHOTONS) {
+        // Randomize triangle to emit from
+        int triangle_index = uni(rng);
+        Triangle* triangle = emitting_triangles.at(triangle_index);
+        ColorRGB emitted_radiance = ColorRGB(500, 500, 500); //triangle->get_material()->get_color() * triangle->get_material()->get_flux();
 
         // Calculate emission position and direction from emission triangle
         vec3 emission_pos = triangle->RandomizePointOnTriangle();
         vec3 emission_direction = CosineDistributeDirection(triangle->get_normal());
         //vec3 emission_direction = normalize(vec3(((float) rand()) / (RAND_MAX) - 0.5f, ((float) rand()) / (RAND_MAX) - 0.5f,((float) rand()) / (RAND_MAX) - 0.5f));
 
-        EmitPhoton(emission_pos, emission_direction, emitted_radiance);
+        EmitCausticsPhoton(emission_pos, emission_direction, emitted_radiance, false);
     }
 
 
@@ -95,12 +139,19 @@ void PhotonMapper::Start() {
     // Build map for photons
     photon_map = new PhotonOctree(region, temporary_photons, 0);
     photon_map->BuildTree();
-    //photon_map->displayTree();
+
+    caustics_photon_map = new PhotonOctree(region, temporary_caustics_photons, 0);
+    caustics_photon_map->BuildTree();
+
     std::cout << "Photon mapping finished, photons emitted: " << emitted_photons << ", time elapsed: " << float( clock () - begin_time ) /  CLOCKS_PER_SEC << "s" << std::endl;
 }
 
 PhotonOctree *PhotonMapper::get_photon_map() {
     return photon_map;
+}
+
+PhotonOctree *PhotonMapper::get_caustics_photon_map() {
+    return caustics_photon_map;
 }
 
 
