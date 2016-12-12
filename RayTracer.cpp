@@ -28,7 +28,7 @@ ColorRGB RayTracer::MeanFromPhotonMap(vec3 position, vec3 object_normal) {
     }
 
     float photon_radius = Renderer::PHOTON_RADIUS;
-    radiance = radiance * (1.0f / ((float) M_PI) * photon_radius * photon_radius) / 500.0f;
+    radiance = radiance * (1.0f / ((float) M_PI) * photon_radius * photon_radius) / 150.0f;
 
     return radiance;
 }
@@ -45,7 +45,7 @@ ColorRGB RayTracer::MeanFromCausticsPhotonMap(vec3 position, vec3 object_normal)
     }
 
     float photon_radius = Renderer::CAUSTIC_PHOTON_RADIUS;
-    radiance = radiance * (1.0f / ((float) M_PI) * photon_radius * photon_radius) / 500.0f;
+    radiance = radiance * (1.0f / ((float) M_PI) * photon_radius * photon_radius) / 150.0f;
 
     return radiance;
 }
@@ -112,8 +112,8 @@ ColorRGB RayTracer::TraceRay(Ray ray, bool perform_full_calc) {
         // Return if ray exceeds max iterations
         if (ray.get_ray_iterations() > 5 || collision_material == nullptr) return ColorRGB(0,0,0);
 
-        return MeanFromCausticsPhotonMap(collision_pos, collision_normal);
-        //return MeanFromPhotonMap(collision_pos, collision_normal);
+        //return MeanFromCausticsPhotonMap(collision_pos, collision_normal);
+        //return MeanFromPhotonMap(collision_pos, collision_normal) + MeanFromCausticsPhotonMap(collision_pos, collision_normal);
 
         // Create child rays
         vec3 reflected_dir, transmitted_dir = vec3(0.0);
@@ -149,7 +149,7 @@ ColorRGB RayTracer::TraceRay(Ray ray, bool perform_full_calc) {
         else if (material_type == BaseMaterial::TRANSMITTING) {
             if (ray.get_ray_iterations() < 2) {
                 if (!ray_reflected) return TraceRay(transmitted_ray, true);
-                return TraceRay(transmitted_ray, true) * (1.0f - radiance_distribution) + TraceRay(reflected_ray, true) * radiance_distribution;
+                return (TraceRay(transmitted_ray, true) * (1.0f - radiance_distribution) + TraceRay(reflected_ray, true) * radiance_distribution) * collision_material->BRDF(ray.get_direction(), vec3(0), collision_normal);
             }
         }
 
@@ -172,7 +172,7 @@ ColorRGB RayTracer::TraceRay(Ray ray, bool perform_full_calc) {
                     reflectance_radiance = TraceRay(reflected_ray, false) * collision_material->BRDF(ray.get_direction(), reflected_dir, collision_normal);
                 }
 
-                return light_radiance + reflectance_radiance;
+                return light_radiance + reflectance_radiance + MeanFromCausticsPhotonMap(collision_pos, collision_normal);
             }
 
         }

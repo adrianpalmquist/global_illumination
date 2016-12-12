@@ -59,9 +59,28 @@ void PhotonMapper::EmitPhoton(vec3 emission_pos, vec3 emission_direction, ColorR
 void PhotonMapper::EmitCausticsPhoton(vec3 emission_pos, vec3 emission_direction, ColorRGB emission_radiance, bool arriving_from_transmission) {
     vec3 collision_pos, collision_normal;
     BaseMaterial* collision_material;
+//
+//    if (collision_material->get_material_type() == BaseMaterial::DIFFUSE || collision_material->get_material_type() == BaseMaterial::OREN_NAYAR) {
+//        // Check material BRDF if we get reflected/transmitted rays
+//        vec3 reflected_dir, transmitted_dir = vec3(0.0);
+//        float radiance_distribution = 1.0;
+//
+//        collision_material->PDF(emission_direction, collision_normal, reflected_dir, transmitted_dir, radiance_distribution);
+//
+//        ColorRGB radiance = collision_material->BRDF(emission_direction, reflected_dir, collision_normal) * emission_radiance;
+//
+//        // Add photon to temporary photon map
+//        temporary_caustics_photons.push_back(new Photon(radiance, collision_pos, emission_direction));
+//        emitted_caustics_photons++;
+//
+//        if (length(reflected_dir) != 0 && !isnan(length(reflected_dir))) {
+//            EmitCausticsPhoton(collision_pos + reflected_dir * 0.01f, reflected_dir, radiance, true);
+//        }
+//    }
 
-    Ray ray(emission_pos, emission_direction, 0);
+    Ray ray(emission_pos + emission_direction * 0.01f, emission_direction, 0);
     if (scene->RayIntersection(ray, collision_pos, collision_normal, collision_material)) {
+        //std::cout << emission_direction.x << " " << emission_direction.y << " " << emission_direction.z << std::endl;
         if (arriving_from_transmission && (collision_material->get_material_type() == BaseMaterial::DIFFUSE || collision_material->get_material_type() == BaseMaterial::OREN_NAYAR)) {
             // Check material BRDF if we get reflected/transmitted rays
             vec3 reflected_dir, transmitted_dir = vec3(0.0);
@@ -81,11 +100,13 @@ void PhotonMapper::EmitCausticsPhoton(vec3 emission_pos, vec3 emission_direction
             vec3 reflected_dir, transmitted_dir = vec3(0.0);
             float radiance_distribution = 1.0;
 
+
             collision_material->PDF(emission_direction, collision_normal, reflected_dir, transmitted_dir, radiance_distribution);
+
             ColorRGB radiance = collision_material->BRDF(emission_direction, reflected_dir, collision_normal) * emission_radiance;
 
-            if (length(transmitted_dir) != 0 && !isnan(length(transmitted_dir))) {
-                EmitCausticsPhoton(collision_pos + transmitted_dir * 0.01f, transmitted_dir, radiance, true);
+            if (transmitted_dir.x != 0 && transmitted_dir.y != 0.0f && transmitted_dir.z != 0.0f) {
+                EmitCausticsPhoton(collision_pos, transmitted_dir, radiance, true);
             }
         }
     }
@@ -110,7 +131,7 @@ void PhotonMapper::Start() {
         // Randomize triangle to emit from
         int triangle_index = uni(rng);
         Triangle* triangle = emitting_triangles.at(triangle_index);
-        ColorRGB emitted_radiance = ColorRGB(500, 500, 500); //triangle->get_material()->get_color() * triangle->get_material()->get_flux();
+        ColorRGB emitted_radiance = ColorRGB(150, 150, 150); //triangle->get_material()->get_color() * triangle->get_material()->get_flux();
 
         // Calculate emission position and direction from emission triangle
         vec3 emission_pos = triangle->RandomizePointOnTriangle();
@@ -123,7 +144,7 @@ void PhotonMapper::Start() {
         // Randomize triangle to emit from
         int triangle_index = uni(rng);
         Triangle* triangle = emitting_triangles.at(triangle_index);
-        ColorRGB emitted_radiance = ColorRGB(500, 500, 500); //triangle->get_material()->get_color() * triangle->get_material()->get_flux();
+        ColorRGB emitted_radiance = ColorRGB(150, 150, 150); //triangle->get_material()->get_color() * triangle->get_material()->get_flux();
 
         // Calculate emission position and direction from emission triangle
         vec3 emission_pos = triangle->RandomizePointOnTriangle();

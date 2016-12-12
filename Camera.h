@@ -10,8 +10,8 @@
 
 class Camera {
 public:
-    static const int CAMERA_WIDTH = 600;
-    static const int CAMERA_HEIGHT = 600;
+    static const int CAMERA_WIDTH = 512;
+    static const int CAMERA_HEIGHT = 512;
 
     Camera();
     vec3 get_camera_position();

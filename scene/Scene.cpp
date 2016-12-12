@@ -24,9 +24,10 @@ void Scene::CreateDefaultScene() {
     BaseMaterial* diffuse_blue_material = new OrenNayarMaterial(ColorRGB(0,0,1));
     BaseMaterial* diffuse_yellow_material = new OrenNayarMaterial(ColorRGB(1,1,0));
     BaseMaterial* diffuse_white_material = new OrenNayarMaterial(ColorRGB(1,1,1));
-    BaseMaterial* specular_red_material = new SpecularMaterial(ColorRGB(1.0, 0.2, 0.2));
-    BaseMaterial* transmission_material = new TransmissionMaterial(ColorRGB(1,1,1));
-    BaseMaterial* emission_material = new EmissionMaterial(ColorRGB(1,1,1), 500);
+    BaseMaterial* specular_red_material = new SpecularMaterial(ColorRGB(0.2, 0.5, 0.6));
+    BaseMaterial* specular_blue_material = new SpecularMaterial(ColorRGB(0.2, 0.2, 1.0));
+    BaseMaterial* transmission_material = new TransmissionMaterial(ColorRGB(1.0, 0.3, 0.3));
+    BaseMaterial* emission_material = new EmissionMaterial(ColorRGB(1,1,1), 150);
 
     // Room objects
     Object3d floor = Object3d::loadObj("../models/floor.obj", diffuse_white_material);
@@ -43,6 +44,12 @@ void Scene::CreateDefaultScene() {
     Object3d light_plane = Object3d::loadObj("../models/light_plane.obj", emission_material);
     objects.push_back(light_plane);
 
+    Object3d box = Object3d::loadObj("../models/box.obj", diffuse_yellow_material);
+    objects.push_back(box);
+
+    Object3d pyramid = Object3d::loadObj("../models/pyramid.obj", specular_blue_material);
+    objects.push_back(pyramid);
+
 
     // Teapot object
     //Object3d teapot = Object3d::loadObj("models/teapot.obj",diffuse_blue_material);
@@ -51,7 +58,7 @@ void Scene::CreateDefaultScene() {
     // Spheres
     //spheres.push_back(new Sphere(vec3(5,-4,-2), 2.0f, diffuse_blue_material));
     //spheres.push_back(new Sphere(vec3(10,1.5,-2), 2.5f, transmission_material)); // too close to wall
-    spheres.push_back(new Sphere(vec3(9,0.8,-2), 2.0f, transmission_material));
+    spheres.push_back(new Sphere(vec3(9,0.8, -2.5), 2.0f, transmission_material));
 }
 
 Scene::~Scene() {}

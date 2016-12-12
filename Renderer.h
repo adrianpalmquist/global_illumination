@@ -13,14 +13,14 @@
 
 class Renderer {
 public:
-    static const bool ANTI_ALIASING = false;
+    static const bool ANTI_ALIASING = true;
     static const int ANTI_ALIASING_SAMPLES = 4;
     static const int NUM_SHADOW_RAYS = 10;
     static const int PATHTRACING_SAMPLES = 1000;
 
     // Photon mapping settings
     static const int NUM_PHOTONS = 300000;
-    static constexpr float PHOTON_RADIUS = 0.4f;
+    static constexpr float PHOTON_RADIUS = 0.3f;
 
     static const int NUM_CAUSTICS_PHOTONS = 1000000;
     static constexpr float CAUSTIC_PHOTON_RADIUS = 0.01f;

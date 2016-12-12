@@ -56,7 +56,6 @@ void TransmissionMaterial::TransmitRay(vec3 direction, vec3 collision_normal, ve
         transmitted_direction = normalize((n1/n2) * direction + ((n1/n2) * cosf(angle) - sqrt(1.0f - sin_theta_2)) * real_normal);
 
         radiance_dist = (r_s + r_p) / 2;
-        //radiance_dist = 1.0f;
 
         if (!incoming_ray && angle > 0.73f) {
             radiance_dist = 1.0f;
