@@ -45,12 +45,13 @@ void Scene::CreateDefaultScene() {
 
 
     // Teapot object
-//    Object3d teapot = Object3d::loadObj("models/test.obj");
-//    objects.push_back(teapot);
+    //Object3d teapot = Object3d::loadObj("models/teapot.obj",diffuse_blue_material);
+    //objects.push_back(teapot);
 
     // Spheres
-    spheres.push_back(new Sphere(vec3(5,-4,-2), 2.0f, diffuse_blue_material));
-    spheres.push_back(new Sphere(vec3(10,1.5,-2), 2.5f, transmission_material));
+    //spheres.push_back(new Sphere(vec3(5,-4,-2), 2.0f, diffuse_blue_material));
+    //spheres.push_back(new Sphere(vec3(10,1.5,-2), 2.5f, transmission_material)); // too close to wall
+    spheres.push_back(new Sphere(vec3(9,0.1,-2), 1.5f, transmission_material));
 }
 
 Scene::~Scene() {}

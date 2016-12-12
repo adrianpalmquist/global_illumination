@@ -37,10 +37,13 @@ void TransmissionMaterial::TransmitRay(vec3 direction, vec3 collision_normal, ve
             n2 = 1.0f;
         }
 
-
+        // Solution from: http://staffwww.itn.liu.se/~mardi06/WebPages/Courses/TNCG15/Lecture4New.pdf
+        /*
         transmitted_direction = normalize((n1 / n2) * direction + real_normal * (
                 -(n1 / n2) * dot(real_normal, direction) -
                 sqrtf(1.0f - powf((n1 / n2), 2.0f) * (1.0f - (powf(dot(real_normal, direction), 2))))));
+        */
+
 
         float angle = acosf(dot(-direction, real_normal));
         float r_s = powf((n1 * cosf(angle) - n2 * sqrtf(1.0f - powf((n1 / n2) * sinf(angle), 2.0f))) /
@@ -48,8 +51,13 @@ void TransmissionMaterial::TransmitRay(vec3 direction, vec3 collision_normal, ve
         float r_p = powf((n1 * sqrtf(1.0f - powf((n1 / n2) * sinf(angle), 2)) - n2 * cosf(angle)) /
                                  (n1 * sqrtf(1.0f - pow((n1 / n2) * sinf(angle), 2.0f)) + n2 * cosf(angle)), 2.0f);
 
+        // Solution from: https://graphics.stanford.edu/courses/cs148-10-summer/docs/2006--degreve--reflection_refraction.pdf
+        float sin_theta_2 = powf((n1/n2),2) * (1.0f - powf(cosf(angle),2));
+        transmitted_direction = normalize((n1/n2) * direction + ((n1/n2) * cosf(angle) - sqrt(1.0f - sin_theta_2)) * real_normal);
+
+
         radiance_dist = (r_s + r_p) / 2;
-        //radiance_dist = 0.0f;
+        //radiance_dist = 1.0f;
 
         if (!incoming_ray && angle > 0.73f) {
             radiance_dist = 1.0f;

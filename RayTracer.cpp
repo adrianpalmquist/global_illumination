@@ -147,6 +147,7 @@ ColorRGB RayTracer::TraceRay(Ray ray, bool perform_full_calc) {
                 ColorRGB incoming_light_radiance = TraceShadowRays(ray, collision_pos, collision_normal);
                 light_radiance = incoming_light_radiance * collision_material->BRDF(ray.get_direction(), reflected_dir, collision_normal);
 
+
                 if (ray_reflected) {
                     reflectance_radiance = TraceRay(reflected_ray, false) * collision_material->BRDF(ray.get_direction(), reflected_dir, collision_normal);
                 }

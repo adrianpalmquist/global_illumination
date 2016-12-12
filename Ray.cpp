@@ -66,6 +66,3 @@ void Ray::add_shadow_ray(Ray *shadow_ray) {
 void Ray::add_ray_color(ColorRGB _ray_clr) {
     ray_clr += _ray_clr;
 }
-
-
-
