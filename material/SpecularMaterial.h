@@ -10,13 +10,15 @@
 
 class SpecularMaterial : public BaseMaterial {
 public:
-    SpecularMaterial(ColorDbl _color) : BaseMaterial(_color) { };
+    SpecularMaterial(ColorRGB _color) : BaseMaterial(_color) { };
 
-    virtual void BRDF(Ray* ray, vec3 collision_normal);
+    ColorRGB BRDF(vec3 incoming_direction, vec3 outgoing_direction, vec3 collision_normal);
+    void PDF(vec3 ray_direction, vec3 collision_normal, vec3 &reflected_dir, vec3 &transmitted_dir, float &radiance_dist);
 
+    int get_material_type() { return BaseMaterial::SPECULAR; }
 private:
-    vec3 ReflectRay(Ray* ray, vec3 collision_normal);
-    void TransmitRay(Ray* ray, vec3 collision_normal, vec3 reflected_direction);
+    void ReflectRay(vec3 direction, vec3 collision_normal, vec3& reflected_direction);
+    void TransmitRay(vec3 direction, vec3 collision_normal, vec3 reflected_direction, float &radiance_dist, vec3 &transmitted_direction);
 };
 
 

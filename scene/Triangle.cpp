@@ -9,8 +9,9 @@ Triangle::Triangle() {}
 
 Triangle::~Triangle() {}
 
-Triangle::Triangle(vec3* _v1, vec3* _v2, vec3* _v3, BaseMaterial* _material) : v0(_v1), v1(_v2), v2(_v3), material(_material) {
+Triangle::Triangle(vec3* _v1, vec3* _v2, vec3* _v3) : v0(_v1), v1(_v2), v2(_v3) {
     calculateNormal();
+    calculate_triangle_area();
 }
 
 // Calculates normal from vertices
@@ -65,10 +66,34 @@ vec3 Triangle::get_reflection(vec3 direction, vec3 normal) {
     return reflected;
 }
 
-BaseMaterial *Triangle::get_material() {
-    return material;
-}
-
 vec3 Triangle::BarycentricToCartesian(float u, float v) {
     return (1 - u - v) * (*v0) + u * (*v1) + v * (*v2);
+}
+
+vec3 Triangle::RandomizePointOnTriangle() {
+//    float u = ((float) rand() / (RAND_MAX));
+//    float v = (1.0f - u) * ((float) rand() / (RAND_MAX));
+//    return BarycentricToCartesian(u, v);
+    float u, v;
+
+    while (true) {
+        // Randomize two points on the emission triangle using Baycentric coordinate
+        u = ((float) rand() / (RAND_MAX));
+        v = ((float) rand() / (RAND_MAX));
+
+        // Check so that the coordinate sum is less than 1
+        if (u + v < 1) {
+            return BarycentricToCartesian(u, v);
+        }
+    }
+}
+
+void Triangle::calculate_triangle_area() {
+    vec3 edge1 = *v1 - *v0;
+    vec3 edge2 = *v2 - *v0;
+    triangle_area = 0.5f * length(cross(edge1, edge2));
+}
+
+float Triangle::get_triangle_area() {
+    return triangle_area;
 }

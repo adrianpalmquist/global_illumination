@@ -8,28 +8,33 @@
 
 #include <vector>
 #include "Triangle.h"
-#include "Sphere.h"
+#include "../Sphere.h"
+#include "Object3d.h"
+#include "../Ray.h"
+#include "../material/BaseMaterial.h"
 
 // Forward declaration to avoid circular referencing
 class Ray;
-class PhotonMapper;
 
 class Scene {
 public:
     Scene();
     ~Scene();
 
-    bool RayIntersection(vec3 start_point, vec3 direction, vec3 &collision_pos, vec3 &collision_normal, BaseMaterial *&collision_material);
-    bool RayIntersection(vec3 start_point, vec3 direction, vec3 &collision_pos);
+    bool RayIntersection(Ray ray, vec3 &collision_pos, vec3 &collision_normal, BaseMaterial *&collision_material);
+    bool RayIntersection(Ray ray, vec3 &collision_pos);
+    bool ShadowRayIntersection(Ray ray, vec3 &collision_pos);
     void PrepareForRender();
 
-    std::vector<Triangle*> get_triangles();
+    //std::vector<Triangle*> get_triangles();
     std::vector<Triangle*> get_light_emitting_triangles();
+    std::vector<Object3d> get_light_emitting_objects();
     std::vector<Sphere*> get_spheres();
 private:
     //PhotonMapper photonMapper;
-    std::vector<Triangle*> triangles;
+    std::vector<Object3d> objects;
     std::vector<Triangle*> light_emitting_triangles; // Calucated before render
+    std::vector<Object3d> light_emitting_objects; // Calucated before render
     std::vector<Sphere*> spheres;
 
     void CreateDefaultScene();

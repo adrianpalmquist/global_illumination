@@ -13,14 +13,14 @@ Camera::Camera() {
     field_of_view = 3.14f / 4.0f;
     look_at = vec3(1,0,0);
 
-    camera_plane = new Pixel*[CAMERA_WIDTH];
+    raw_camera_plane = new Pixel*[CAMERA_WIDTH];
     for (int i = 0; i < CAMERA_WIDTH; ++i) {
-        camera_plane[i] = new Pixel[CAMERA_HEIGHT];
+        raw_camera_plane[i] = new Pixel[CAMERA_HEIGHT];
     }
 
     for (int y = 0; y < Camera::CAMERA_HEIGHT; y++) {
         for (int x = 0; x < Camera::CAMERA_WIDTH; x++) {
-            set_pixel_clr(x, y, ColorDbl(0,0,0));
+            set_raw_pixel_clr(x, y, ColorRGB(0, 0, 0));
         }
     }
 
@@ -85,11 +85,11 @@ std::vector<vec3> Camera::get_camera_direction(int x, int y) {
     }
 }
 
-void Camera::set_pixel_clr(int x, int y, ColorDbl clr) {
-    camera_plane[x][y].set_clr(clr);
+void Camera::set_raw_pixel_clr(int x, int y, ColorRGB clr) {
+    raw_camera_plane[x][y].set_clr(clr);
 }
 
-ColorDbl Camera::get_pixel_clr(int x, int y) {
-    return camera_plane[x][y].get_clr();
+ColorRGB Camera::get_raw_pixel_clr(int x, int y) {
+    return raw_camera_plane[x][y].get_clr();
 }
 

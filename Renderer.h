@@ -5,18 +5,26 @@
 #ifndef TNCG15_PROJ_RENDERER_H
 #define TNCG15_PROJ_RENDERER_H
 
-#include "Scene.h"
+#include "scene/Scene.h"
 #include "Ray.h"
 #include "Camera.h"
 #include "RayTracer.h"
+#include "photon_mapping/PhotonMapper.h"
 
 class Renderer {
 public:
-    static const bool ANTI_ALIASING = false;
+    static const bool ANTI_ALIASING = true;
     static const int ANTI_ALIASING_SAMPLES = 4;
-    static const int NUM_SHADOW_RAYS = 5;
-    static const int PATH_TRACING_MAX_SAMPLES = 1000;
-    static const int PATHTRACING_SAMPLES = 10;
+    static const int NUM_SHADOW_RAYS = 10;
+    static const int PATHTRACING_SAMPLES = 1000;
+
+    // Photon mapping settings
+    static const int NUM_PHOTONS = 300000;
+    static constexpr float PHOTON_RADIUS = 0.3f;
+
+    static const int NUM_CAUSTICS_PHOTONS = 1000000;
+    static constexpr float CAUSTIC_PHOTON_RADIUS = 0.01f;
+
     int progress_indicator = -1;
 
     Renderer();
@@ -25,10 +33,9 @@ public:
 private:
     Scene *scene;
     Camera camera;
+    PhotonMapper photon_mapper;
     RayTracer ray_tracer;
 
-    ColorDbl ColorFromRayTree(Ray *parentRay);
-    Ray* Traverse(Ray *ray);
     void progessIndicator(double progress);
 };
 

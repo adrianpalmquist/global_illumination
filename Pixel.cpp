@@ -8,11 +8,11 @@ Ray * Pixel::get_base_ray() const {
     return base_ray;
 }
 
-ColorDbl Pixel::get_clr() const {
+ColorRGB Pixel::get_clr() const {
     return clr;
 }
 
-void Pixel::set_clr(ColorDbl _clr) {
+void Pixel::set_clr(ColorRGB _clr) {
     clr = _clr;
 }
 
